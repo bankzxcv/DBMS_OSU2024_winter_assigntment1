@@ -56,6 +56,8 @@
     "ratio": "cpp",
     "unordered_map": "cpp",
     "variant": "cpp",
-    "algorithm": "cpp"
+    "algorithm": "cpp",
+    "xtree": "cpp",
+    "utility": "cpp"
   }
 }
