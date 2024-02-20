@@ -137,29 +137,29 @@ private:
         NewIdBinaryAfterMod = "";
         //----------------------------------------------------------------------
         // Insert some values into the map
-        // for (int x = 0; x < n ; x++)
-        // {
-        //     string qwe = toBinary(x);
-        //     cout<<"qwe.length()  "<<qwe.length()<<endl;
-        //     cout<<"i  "<<i<<endl;
-        //     if (qwe.length() < i)
-        //     {
-        //         while (qwe.length() != i)
-        //         {
-        //             qwe = "0" + qwe;
-        //         }
-        //     }
-        //     // size_t sizeRange = i;
-        //     // std::string binary = std::bitset<2>(x).to_string(); // to binary
-        //     // std::cout << binary << "\n";
+        for (int x = 0; x < n ; x++)
+        {
+            string qwe = toBinary(x);
+            cout<<"qwe.length()  "<<qwe.length()<<endl;
+            cout<<"i  "<<i<<endl;
+            if (qwe.length() < i)
+            {
+                while (qwe.length() != i)
+                {
+                    qwe = "0" + qwe;
+                }
+            }
+            // size_t sizeRange = i;
+            // std::string binary = std::bitset<2>(x).to_string(); // to binary
+            // std::cout << binary << "\n";
 
-        //     // unsigned long decimal = std::bitset<2>(binary).to_ulong();
-        //     // std::cout << decimal << "\n";
-        //     // // 00,01,10,11 and offset
-        //     // string asdasd = x + " ";
-        //     // cout << "asdasdasdasdasdasda " << asdasd << endl;
-        //     mp[qwe] = x;
-        // }
+            // unsigned long decimal = std::bitset<2>(binary).to_ulong();
+            // std::cout << decimal << "\n";
+            // // 00,01,10,11 and offset
+            // string asdasd = x + " ";
+            // cout << "asdasdasdasdasdasda " << asdasd << endl;
+            mp[qwe] = x;
+        }
 
         map<string, int>::iterator it = mp.begin();
 
