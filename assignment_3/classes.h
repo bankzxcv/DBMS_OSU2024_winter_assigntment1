@@ -24,7 +24,7 @@ public:
 
     std::vector<char> serializeToString()
     {
-        // cout << "name: " << name << endl;
+        cout << "name: " << name << endl;
         string serialStr = to_string(id) + "$" + name + "$" + bio + "$" +
                            to_string(manager_id) + "$";
         vector<char> serial = {};
@@ -46,7 +46,17 @@ public:
     }
 };
 
- 
+string toBinary(int n)
+{
+    if (n == 0)
+        return "0";
+    else if (n == 1)
+        return "1";
+    else if (n % 2 == 0)
+        return toBinary(n / 2) + "0";
+    else if (n % 2 != 0)
+        return toBinary(n / 2) + "1";
+}
 
 class LinearHashIndex
 {
@@ -127,15 +137,29 @@ private:
         NewIdBinaryAfterMod = "";
         //----------------------------------------------------------------------
         // Insert some values into the map
-        for (int x = 0; x < 2 * n; x++)
-        {
+        // for (int x = 0; x < n ; x++)
+        // {
+        //     string qwe = toBinary(x);
+        //     cout<<"qwe.length()  "<<qwe.length()<<endl;
+        //     cout<<"i  "<<i<<endl;
+        //     if (qwe.length() < i)
+        //     {
+        //         while (qwe.length() != i)
+        //         {
+        //             qwe = "0" + qwe;
+        //         }
+        //     }
+        //     // size_t sizeRange = i;
+        //     // std::string binary = std::bitset<2>(x).to_string(); // to binary
+        //     // std::cout << binary << "\n";
 
-
-//00,01,10,11 and offset
-            string asdasd = x + " ";
-           // cout << "asdasdasdasdasdasda " << asdasd << endl;
-            mp["w"] = 1;
-        }
+        //     // unsigned long decimal = std::bitset<2>(binary).to_ulong();
+        //     // std::cout << decimal << "\n";
+        //     // // 00,01,10,11 and offset
+        //     // string asdasd = x + " ";
+        //     // cout << "asdasdasdasdasdasda " << asdasd << endl;
+        //     mp[qwe] = x;
+        // }
 
         map<string, int>::iterator it = mp.begin();
 
@@ -148,10 +172,7 @@ private:
         }
         //----------------------------------------------------------------------
 
-        for (int j = 0; j < r.size(); j++)
-        {
-            printbinchar(r[j]);
-        }
+       
         // record.print();
         //  r to binary
         //  rBianry = after to binary
@@ -244,12 +265,36 @@ public:
 
         // Create your EmployeeIndex file and write out the initial 4 buckets
         // make sure to account for the created buckets by incrementing nextFreeBlock appropriately
+        for (int x = 0; x < n ; x++)
+        {
+            string qwe = toBinary(x);
+            cout<<"qwe.length()  "<<qwe.length()<<endl;
+            cout<<"i  "<<i<<endl;
+            if (qwe.length() < i)
+            {
+                while (qwe.length() != i)
+                {
+                    qwe = "0" + qwe;
+                }
+            }
+            // size_t sizeRange = i;
+            // std::string binary = std::bitset<2>(x).to_string(); // to binary
+            // std::cout << binary << "\n";
+
+            // unsigned long decimal = std::bitset<2>(binary).to_ulong();
+            // std::cout << decimal << "\n";
+            // // 00,01,10,11 and offset
+            // string asdasd = x + " ";
+            // cout << "asdasdasdasdasdasda " << asdasd << endl;
+            mp[qwe] = x;
+        }
     }
 
     // Read csv file and add records to the index
     void createFromFile(string csvFName)
     {
         // Add records to the EmployeeRelation
+
         std::ifstream csvFile(csvFName);
         // Read the file and add records to the EmployeeRelation
         file = std::ofstream(fName, std::ios::out | std::ios::binary);
