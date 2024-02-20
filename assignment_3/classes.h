@@ -95,7 +95,7 @@ private:
   void printbinchar(char character)
   {
     char output[9];
-    itoa(character, output, 2);
+    // itoa(character, output, 2);
     // printf("%s - %c\n", output,character);
   }
 
