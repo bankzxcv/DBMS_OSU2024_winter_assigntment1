@@ -6,6 +6,8 @@
 #include <bitset>
 #include <fstream>  // Include the necessary header file for the getline function
 #include <map>
+#define _OPEN_SYS_ITOA_EXT
+#include <stdlib.h>
 using namespace std;
 #define MAX 216
 class Record {
@@ -78,9 +80,12 @@ class LinearHashIndex {
   int hashCode(int key, int SIZE) { return key % SIZE; }
 
   void printbinchar(char character) {
-    char output[9];
-    itoa(character, output, 2);
+    // char output[9];
+    // itoa(character, output, 2);
     // printf("%s - %c\n", output,character);
+    std::bitset<32> binary(character);  // Use 32 bits for standard int size
+    std::string binaryString = binary.to_string();
+    cout << binaryString << endl;
   }
 
   string IdBinary = "";
@@ -169,7 +174,7 @@ class LinearHashIndex {
         // hashCode()
         //  DataItem x = record;
         //************** do forget to check after add that we need to to
-        //extention or not (n++) number of pages******************
+        // extention or not (n++) number of pages******************
         //  add Data to Page
 
         // change record to binary
@@ -179,7 +184,7 @@ class LinearHashIndex {
         // might do overflow page
 
         //**************** function check number of data more than 70% or some
-        //thing ****************
+        // thing ****************
         // if(add and page more than 70% do extention increase n (number of
         // page) and if effect to I number (do it)) n++ if j++ change n Ex. n=4
         // , i =2 and n++, j++, (00,01,10,11) ---> n=5 , i =3
