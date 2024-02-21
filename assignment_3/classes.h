@@ -63,13 +63,13 @@ class LinearHashIndex {
   const int MAX_PAGE = 3;
   map<string, int> mp;
   vector<int>
-      blockDirectory;  // Map the least-significant-bits of h(id) to a bucket
+      bucket;  // Map the least-significant-bits of h(id) to a bucket
                        // location in EmployeeIndex (e.g., the jth bucket) can
                        // scan to correct bucket using j*BLOCK_SIZE as offset
                        // (using seek function) can initialize to a size of 256
                        // (assume that we will never have more than 256 regular
                        // (i.e., non-overflow) buckets)
-  int n;  // The number of indexes in blockDirectory currently being used
+  int n;  // The number of indexes in bucket currently being used
   int i;  // The number of least-significant-bits of h(id) to check. Will need
           // to increase i once n > 2^i
   int numRecords;     // Records currently in index. Used to test whether to
