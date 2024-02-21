@@ -575,16 +575,10 @@ class StorageBufferManager {
     // initializeMemory();
     clearPages();
     // cout << "READ FROM FILE" << endl;
-<<<<<<< HEAD
     const std::size_t ChunkSize = BLOCK_SIZE;  // Define the chunk size. 4KB
     std::fstream inFile(
         fileName,
         std::ios::binary | std::ios::in);  // Open the file for reading.
-    == == == = const std::size_t ChunkSize =
-                 BLOCK_SIZE;  // Define the chunk size. 4KB
-    std::ifstream inFile(fileName,
-                         std::ios::binary);  // Open the file for reading.
->>>>>>> da64356cf86ef1c458f488f36bb773b6b852b342
 
     if (!inFile) {
       std::cerr << "Cannot open file for reading: " << fileName << std::endl;
