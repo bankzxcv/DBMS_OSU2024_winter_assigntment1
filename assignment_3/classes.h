@@ -376,12 +376,11 @@ class StorageBufferManager {
     // update the length of the record to slot
     memcpy(memory + BLOCK_SIZE - intSize, &currentLength, intSize);
 
-
     int isPageOverFlow = -1;
     // update record count to slot
     memcpy(memory + BLOCK_SIZE - intSize * 2, &isPageOverFlow, intSize);
 
-        // update record count to slot
+    // update record count to slot
     memcpy(memory + BLOCK_SIZE - intSize * 3, recordCount, intSize);
 
     // update the length of the block to slot
@@ -448,7 +447,7 @@ class StorageBufferManager {
     // Add records to the EmployeeRelation
     std::ifstream csvFile(csvFName);
     // Read the file and add records to the EmployeeRelation
-    file = std::ofstream(fileName, std::ios::out | std::ios::binary);
+    file = std::ofstream(fileName, std::ios::binary | std::ios::out);
     if (!csvFile.is_open()) {
       return;
     }
@@ -530,8 +529,9 @@ class StorageBufferManager {
     clearPages();
     // cout << "READ FROM FILE" << endl;
     const std::size_t ChunkSize = BLOCK_SIZE;  // Define the chunk size. 4KB
-    std::ifstream inFile(fileName,
-                         std::ios::binary);  // Open the file for reading.
+    std::fstream inFile(
+        fileName,
+        std::ios::binary | std::ios::in);  // Open the file for reading.
 
     if (!inFile) {
       std::cerr << "Cannot open file for reading: " << fileName << std::endl;
