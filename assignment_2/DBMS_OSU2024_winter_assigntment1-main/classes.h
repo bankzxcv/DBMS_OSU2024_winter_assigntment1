@@ -6,19 +6,17 @@
 #include <iostream>
 #include <sstream>
 #include <bitset>
-#include <fstream> // Include the necessary header file for the getline function
+#include <fstream>  // Include the necessary header file for the getline function
 using namespace std;
 
-#define intSize sizeof(int) // int size
+#define intSize sizeof(int)  // int size
 
-class Record
-{
-public:
+class Record {
+ public:
   int id, manager_id;
   std::string bio, name;
 
-  Record(vector<std::string> fields)
-  {
+  Record(vector<std::string> fields) {
     id = stoi(fields[0]);
     name = fields[1];
     bio = fields[2];
@@ -27,23 +25,20 @@ public:
 
   // serialize the record by passing memory as an unsigned char argument as
   // unsigned char* memory
-  std::vector<char> serializeToString()
-  {
+  std::vector<char> serializeToString() {
     // cout << "name: " << name << endl;
     string serialStr = to_string(id) + "$" + name + "$" + bio + "$" +
                        to_string(manager_id) + "$";
     vector<char> serial = {};
 
-    for (int i = 0; i < serialStr.size(); i++)
-    {
+    for (int i = 0; i < serialStr.size(); i++) {
       serial.push_back(serialStr[i]);
     }
     // Add the record to the memory
     return serial;
   }
 
-  void print()
-  {
+  void print() {
     cout << "\tID: " << id << "\n";
     cout << "\tNAME: " << name << "\n";
     cout << "\tBIO: " << bio << "\n";
@@ -51,10 +46,9 @@ public:
   }
 };
 
-class StorageBufferManager
-{
-private:
-  const int BLOCK_SIZE = 4096; // initialize the  block size allowed in main
+class StorageBufferManager {
+ private:
+  const int BLOCK_SIZE = 4096;  // initialize the  block size allowed in main
   const int MAX_PAGE = 3;
   // You may declare variables based on your need
   int numRecords = 0;
@@ -77,36 +71,31 @@ private:
   // static_cast<unsigned char*>(std::malloc(BLOCK_SIZE * 3));
   // Create a file to store the records
   string fileName;
-  std::ofstream file;
-  std::ifstream fileReader;
+  std::fstream file;
 
   // create number of Position in each pages
   // create a current page number to show that what is the current page
-  int currentPage = 0; // page 0, 1, 2 due to 3 pages possible
+  int currentPage = 0;  // page 0, 1, 2 due to 3 pages possible
   int currentLength = 0;
 
   // Insert new record
-  void setNextPage()
-  {
+  void setNextPage() {
     currentPage++;
     currentLength = 0;
     memory = pageBuffer[currentPage];
     setLastRecord();
   }
 
-  void setLastRecord()
-  {
+  void setLastRecord() {
     lastRecord = (int *)(memory + BLOCK_SIZE - sizeof(int));
     recordCount = (int *)(memory + BLOCK_SIZE - sizeof(int) * 2);
     *lastRecord = 0;
     *recordCount = 0;
   }
 
-  void initializeMemory()
-  {
+  void initializeMemory() {
     // Initialize the memory
-    for (int i = 0; i < MAX_PAGE+1; i++)
-    {
+    for (int i = 0; i < MAX_PAGE + 1; i++) {
       // free(pageBuffer[i]);
       pageBuffer[i] = static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
     }
@@ -114,19 +103,16 @@ private:
     setLastRecord();
   }
 
-  void insertToMemory(std::vector<char> record)
-  {
+  void insertToMemory(std::vector<char> record) {
     size_t recordLen = record.size();
-    for (int i = 0; i < recordLen; i++)
-    {
+    for (int i = 0; i < recordLen; i++) {
       memory[currentLength + i] = record[i];
     }
 
     currentLength += recordLen;
 
     unsigned char *tmp = (unsigned char *)malloc(recordLen);
-    for (int i = 0; i < recordLen; i++)
-    {
+    for (int i = 0; i < recordLen; i++) {
       tmp[i] = memory[currentLength - recordLen + i];
     }
 
@@ -154,11 +140,8 @@ private:
     // cout << "VALUE =" << *val << " " << *val2 << " " << *val3 << endl;
   }
 
-  void insertRecord(Record record)
-  {
-
-    if (numRecords == 0)
-    {
+  void insertRecord(Record record) {
+    if (numRecords == 0) {
       initializeMemory();
     }
     numRecords++;
@@ -169,15 +152,13 @@ private:
     // Serialize the record and insert record to memory
     std::vector<char> r = record.serializeToString();
     if (r.size() + currentLength >
-        BLOCK_SIZE - sizeof(int) * (3 + (*recordCount)))
-    {
+        BLOCK_SIZE - sizeof(int) * (3 + (*recordCount))) {
       cout << numRecords << " " << r.size() << " " << currentLength << " "
            << BLOCK_SIZE - sizeof(int) * (3 + (*recordCount)) << endl;
       setNextPage();
     }
 
-    if (currentPage == MAX_PAGE)
-    {
+    if (currentPage == MAX_PAGE) {
       cout << "Write Pages buffer to file" << endl;
       writePageBufferToFile();
       isWritten = true;
@@ -186,8 +167,7 @@ private:
     insertToMemory(r);
   }
 
-  void clearPages()
-  {
+  void clearPages() {
     // Clear the page
     // Set the page to 0
 
@@ -200,44 +180,38 @@ private:
     initializeMemory();
   }
 
-public:
-  StorageBufferManager(string NewFileName)
-  {
+ public:
+  StorageBufferManager(string NewFileName) {
     // initialize your variables
     fileName = NewFileName;
   }
 
   // loop print value in pageBuffer[2]
 
-  void writePageBufferToFile()
-  {
-    for (int i = 0; i < MAX_PAGE; i++)
-    {
+  void writePageBufferToFile() {
+    for (int i = 0; i < MAX_PAGE; i++) {
       cout << "Writing to file at Page " << i + 1 << endl;
       file.write((char *)(pageBuffer[i]), BLOCK_SIZE);
     }
   }
 
   // Read csv file (Employee.csv) and add records to the (EmployeeRelation)
-  void createFromFile(string csvFName)
-  {
+  void createFromFile(string csvFName) {
     // Add records to the EmployeeRelation
-    std::ifstream csvFile(csvFName);
+    std::fstream csvFile;
+    csvFile.open(csvFName);
     // Read the file and add records to the EmployeeRelation
-    file = std::ofstream(fileName, std::ios::out | std::ios::binary);
-    if (!csvFile.is_open())
-    {
+    file.open(fileName, std::ios::out | std::ios::binary);
+    if (!csvFile.is_open()) {
       return;
     }
     string line;
-    while (std::getline(csvFile, line, '\n'))
-    {
+    while (std::getline(csvFile, line, '\n')) {
       // Split the line into fields
       vector<string> fields;
       stringstream ss(line);
       string field;
-      while (std::getline(ss, field, ','))
-      {
+      while (std::getline(ss, field, ',')) {
         fields.push_back(field);
       }
       // cout << fields[0] << endl;
@@ -248,8 +222,7 @@ public:
       insertRecord(record);
     }
 
-    if (isWritten == false)
-    {
+    if (isWritten == false) {
       cout << "Write Pages buffer to file...." << endl;
       writePageBufferToFile();
       isWritten = true;
@@ -261,10 +234,8 @@ public:
     clearPages();
   }
 
-  void findValue(int pgCount, int target, unsigned char *pageBufferTmp)
-  {
-    for (int n = 0; n < pgCount; n++)
-    {
+  void findValue(int pgCount, int target, unsigned char *pageBufferTmp) {
+    for (int n = 0; n < pgCount; n++) {
       // cout << "PAGE COUNT: " << pgCount << " " << n << endl;
       memory = pageBufferTmp;
       int *val = (int *)(memory + BLOCK_SIZE - intSize);
@@ -276,8 +247,7 @@ public:
       // cout << "Print Size val: " << *val << " __" << *val2 << endl;
 
       int sum = 0;
-      for (int i = 0; i < itemCount; i++)
-      {
+      for (int i = 0; i < itemCount; i++) {
         int *val3 = (int *)(memory + BLOCK_SIZE - intSize * 3 - intSize * i);
         // cout << "Print Size val3 : " << *val3 << " __" << endl;
         char *val4 = (char *)malloc(*val3);
@@ -289,14 +259,12 @@ public:
         string str = string(val4);
         stringstream ss(str);
         string field;
-        while (std::getline(ss, field, '$'))
-        {
+        while (std::getline(ss, field, '$')) {
           fields.push_back(field);
         }
         // cout << "ID: " << fields[0] << endl;
         Record record(fields);
-        if (record.id == target)
-        {
+        if (record.id == target) {
           isFound = 1;
           record.print();
           return;
@@ -307,10 +275,8 @@ public:
 
   void b2b() {}
 
-  void readFromFile(int target)
-  {
-    for (int i = 0; i < MAX_PAGE; i++)
-    {
+  void readFromFile(int target) {
+    for (int i = 0; i < MAX_PAGE; i++) {
       free(pageBuffer[i]);
       pageBuffer[i] = static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
     }
@@ -318,12 +284,12 @@ public:
     // initializeMemory();
     clearPages();
     // cout << "READ FROM FILE" << endl;
-    const std::size_t ChunkSize = BLOCK_SIZE; // Define the chunk size. 4KB
-    std::ifstream inFile(fileName,
-                         std::ios::binary); // Open the file for reading.
+    const std::size_t ChunkSize = BLOCK_SIZE;  // Define the chunk size. 4KB
+    std::fstream inFile;
 
-    if (!inFile)
-    {
+    inFile.open(fileName, std::ios::binary);  // Open the file for reading.
+
+    if (!inFile) {
       std::cerr << "Cannot open file for reading: " << fileName << std::endl;
       return;
     }
@@ -334,18 +300,16 @@ public:
 
     unsigned char *pageBufferTmp =
         static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
-    while (inFile.read(reinterpret_cast<char *>(buffer.data()), ChunkSize))
-    {
+    while (inFile.read(reinterpret_cast<char *>(buffer.data()), ChunkSize)) {
       // memcpy(pageBuffer[pgCount++], buffer.data(), ChunkSize);
       memcpy(pageBufferTmp, buffer.data(), ChunkSize);
       findValue(1, target, pageBufferTmp);
     }
-    inFile.close(); // Close the file.
+    inFile.close();  // Close the file.
   }
 
   // Given an ID, find the relevant record and print it
-  void findRecordById(int id)
-  {
+  void findRecordById(int id) {
     cout << "Finding record with id: " << id << endl;
     readFromFile(id);
   }
