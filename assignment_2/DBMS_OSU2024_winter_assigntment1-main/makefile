@@ -1,7 +1,7 @@
 # generate make file to build main.cpp in program by using clang
 #
 CC = g++
-CFLAGS = -Wall -Wextra -std=c++11
+CFLAGS = -std=c++11
 
 all: program
 

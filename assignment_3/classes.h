@@ -303,6 +303,7 @@ class StorageBufferManager {
   const int MAX_PAGE = 3;
   // You may declare variables based on your need
   int numRecords = 0;
+  int overallSize = 0;
 
   // pointer of page of memory with having 4096 bytes each
   // memory that store the variable-length records as unsigned byte array
@@ -360,9 +361,7 @@ class StorageBufferManager {
     for (int i = 0; i < recordLen; i++) {
       memory[currentLength + i] = record[i];
     }
-
     currentLength += recordLen;
-
     unsigned char *tmp = (unsigned char *)malloc(recordLen);
     for (int i = 0; i < recordLen; i++) {
       tmp[i] = memory[currentLength - recordLen + i];
