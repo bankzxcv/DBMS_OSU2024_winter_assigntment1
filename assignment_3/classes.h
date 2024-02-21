@@ -9,7 +9,7 @@
 #include <map>
 #include <cstdio>
 #include <cstdlib>
-
+#include <list>
 #define intSize sizeof(int)  // int size
 using namespace std;
 #define MAX 216
@@ -112,6 +112,7 @@ class LinearHashIndex {
   int ni = 0;
   // Insert new record into index
   void insertRecord(Record record) {
+    //-------------------------------------- mod , cut string
     ni++;
     printf("insert_Each_data (%d)\n", ni);
     std::vector<char> r = record.serializeToString();
@@ -130,6 +131,50 @@ class LinearHashIndex {
     string indexAfterCut = NewIdBinaryAfterMod.substr(
         NewIdBinaryAfterMod.length() - i, NewIdBinaryAfterMod.length());
     cout << indexAfterCut << endl;
+    // cout << "sdfsfsdfsdfsdfsdfsdf" << endl;
+    //--------------------------------------
+    // if (true) // <total_number_of_bytes_stored> /
+    // (4KB*<number_of_non_overflow_pages>
+    // {
+    //   list<string> testlist;
+    //   list<int> testlist2;
+
+    //   n++;
+    //   if (n > 2 ^ i)
+    //   {
+    //     i++;
+
+    //     int q = 0;
+    //     for (auto itr = mp.begin(); itr != mp.end(); ++itr)
+    //     {
+
+    //       mp["0" + itr->first] = itr->second;
+    //       //cout << "sdfsfsdfsdfsdfsdfsdf" << endl;
+    //       string s = itr->first;
+    //       testlist.push_back(s);
+
+    //       testlist2.push_back(itr->second);
+    //       q++;
+    //     }
+
+    //     mp[indexAfterCut] = n;
+
+    //     // string remove = [];
+    //     // how to delete the old one?
+    //     int jj = 0;
+    //     for (auto i : testlist)
+    //     {
+    //       auto l_front = testlist2.begin();
+
+    //       std::advance(l_front, jj);
+
+    //       int ans = *l_front;
+    //       mp["0" + i] = ans;
+    //       mp.erase(i);
+    //       jj++;
+    //     }
+    //   }
+    // }
     map<string, int>::iterator it = mp.begin();
 
     // Iterate through the map and print the elements
@@ -137,9 +182,11 @@ class LinearHashIndex {
     while (it != mp.end()) {
       // cout << "it->first: " << it->first << ", NewIdBinaryAfterMod: " <<
       // indexAfterCut << endl;
-      if (it->first == indexAfterCut) {
-        cout << "Key: " << it->first << ", Value: " << it->second << endl;
-      }
+      // if (it->first == indexAfterCut)
+      // {
+      //   cout << "Key: " << it->first << ", Value: " << it->second << endl;
+      // }
+      cout << "Key: " << it->first << ", Value: " << it->second << endl;
 
       ++it;
     }
@@ -528,10 +575,16 @@ class StorageBufferManager {
     // initializeMemory();
     clearPages();
     // cout << "READ FROM FILE" << endl;
+<<<<<<< HEAD
     const std::size_t ChunkSize = BLOCK_SIZE;  // Define the chunk size. 4KB
     std::fstream inFile(
         fileName,
         std::ios::binary | std::ios::in);  // Open the file for reading.
+    == == == = const std::size_t ChunkSize =
+                 BLOCK_SIZE;  // Define the chunk size. 4KB
+    std::ifstream inFile(fileName,
+                         std::ios::binary);  // Open the file for reading.
+>>>>>>> da64356cf86ef1c458f488f36bb773b6b852b342
 
     if (!inFile) {
       std::cerr << "Cannot open file for reading: " << fileName << std::endl;
