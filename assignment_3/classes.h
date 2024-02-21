@@ -62,14 +62,13 @@ class LinearHashIndex {
   const int BLOCK_SIZE = 4096;
   const int MAX_PAGE = 3;
   map<string, int> mp;
-  vector<int>
-      bucket;  // Map the least-significant-bits of h(id) to a bucket
+  vector<int> bucket;  // Map the least-significant-bits of h(id) to a bucket
                        // location in EmployeeIndex (e.g., the jth bucket) can
                        // scan to correct bucket using j*BLOCK_SIZE as offset
                        // (using seek function) can initialize to a size of 256
                        // (assume that we will never have more than 256 regular
                        // (i.e., non-overflow) buckets)
-  int n;  // The number of indexes in bucket currently being used
+  int n;               // The number of indexes in bucket currently being used
   int i;  // The number of least-significant-bits of h(id) to check. Will need
           // to increase i once n > 2^i
   int numRecords;     // Records currently in index. Used to test whether to
@@ -82,7 +81,6 @@ class LinearHashIndex {
   int currentPage = 0;      // 0,1,2
 
   std::ofstream file;
-  std::ifstream fileReader;
 
   void setNextPage() {
     currentPage++;
@@ -309,7 +307,8 @@ class LinearHashIndex {
 
     std::ifstream csvFile(csvFName);
     // Read the file and add records to the EmployeeRelation
-    file = std::ofstream(fName, std::ios::out | std::ios::binary);
+    // file = std::ofstream(fName, std::ios::out | std::ios::binary);
+    file.open(fName, std::ios::out | std::ios::binary);
     if (!csvFile.is_open()) {
       return;
     }
@@ -370,8 +369,7 @@ class StorageBufferManager {
   // static_cast<unsigned char*>(std::malloc(BLOCK_SIZE * 3));
   // Create a file to store the records
   string fileName;
-  std::ofstream file;
-  std::ifstream fileReader;
+  std::fstream file;
 
   // create number of Position in each pages
   // create a current page number to show that what is the current page
@@ -492,9 +490,11 @@ class StorageBufferManager {
   // Read csv file (Employee.csv) and add records to the (EmployeeRelation)
   void createFromFile(string csvFName) {
     // Add records to the EmployeeRelation
-    std::ifstream csvFile(csvFName);
+    std::fstream csvFile;
     // Read the file and add records to the EmployeeRelation
-    file = std::ofstream(fileName, std::ios::binary | std::ios::out);
+    // file = std::ofstream(fileName, std::ios::binary | std::ios::out);
+    file.open(fileName, std::ios::binary | std::ios::out);
+    csvFile.open(csvFName, std::ios::in);
     if (!csvFile.is_open()) {
       return;
     }
@@ -576,9 +576,8 @@ class StorageBufferManager {
     clearPages();
     // cout << "READ FROM FILE" << endl;
     const std::size_t ChunkSize = BLOCK_SIZE;  // Define the chunk size. 4KB
-    std::fstream inFile(
-        fileName,
-        std::ios::binary | std::ios::in);  // Open the file for reading.
+    std::fstream inFile;
+    inFile.open(fileName, std::ios::binary | std::ios::in);
 
     if (!inFile) {
       std::cerr << "Cannot open file for reading: " << fileName << std::endl;
