@@ -382,6 +382,7 @@ private:
   const int MAX_PAGE = 3;
   // You may declare variables based on your need
   int numRecords = 0;
+  int overallSize = 0;
 
   // pointer of page of memory with having 4096 bytes each
   // memory that store the variable-length records as unsigned byte array
@@ -421,7 +422,7 @@ private:
   void setLastRecord()
   {
     lastRecord = (int *)(memory + BLOCK_SIZE - sizeof(int));
-    recordCount = (int *)(memory + BLOCK_SIZE - sizeof(int) * 2);
+    recordCount = (int *)(memory + BLOCK_SIZE - sizeof(int) * 3);
     *lastRecord = 0;
     *recordCount = 0;
   }
@@ -445,9 +446,7 @@ private:
     {
       memory[currentLength + i] = record[i];
     }
-
     currentLength += recordLen;
-
     unsigned char *tmp = (unsigned char *)malloc(recordLen);
     for (int i = 0; i < recordLen; i++)
     {
@@ -463,18 +462,23 @@ private:
     // update the length of the record to slot
     memcpy(memory + BLOCK_SIZE - intSize, &currentLength, intSize);
 
+
+    int isPageOverFlow = -1;
     // update record count to slot
-    memcpy(memory + BLOCK_SIZE - intSize * 2, recordCount, intSize);
+    memcpy(memory + BLOCK_SIZE - intSize * 2, &isPageOverFlow, intSize);
+
+        // update record count to slot
+    memcpy(memory + BLOCK_SIZE - intSize * 3, recordCount, intSize);
 
     // update the length of the block to slot
     int lengthOfBlock = (int)record.size();
-    memcpy(memory + BLOCK_SIZE - intSize * 2 - intSize * (*recordCount),
+    memcpy(memory + BLOCK_SIZE - intSize * 3 - intSize * (*recordCount),
            &lengthOfBlock, intSize);
 
     int *val = (int *)(memory + BLOCK_SIZE - intSize);
-    int *val2 = (int *)(memory + BLOCK_SIZE - intSize * 2);
+    int *val2 = (int *)(memory + BLOCK_SIZE - intSize * 3);
     int *val3 =
-        (int *)(memory + BLOCK_SIZE - intSize * 2 - intSize * (*recordCount));
+        (int *)(memory + BLOCK_SIZE - intSize * 3 - intSize * (*recordCount));
     // cout << "VALUE =" << *val << " " << *val2 << " " << *val3 << endl;
   }
 
@@ -492,10 +496,9 @@ private:
     // Serialize the record and insert record to memory
     std::vector<char> r = record.serializeToString();
     if (r.size() + currentLength >
-        BLOCK_SIZE - sizeof(int) * (3 + (*recordCount)))
-    {
+        BLOCK_SIZE - sizeof(int) * (4 + (*recordCount))) {
       cout << numRecords << " " << r.size() << " " << currentLength << " "
-           << BLOCK_SIZE - sizeof(int) * (3 + (*recordCount)) << endl;
+           << BLOCK_SIZE - sizeof(int) * (4 + (*recordCount)) << endl;
       setNextPage();
     }
 
@@ -509,17 +512,8 @@ private:
     insertToMemory(r);
   }
 
-  void clearPages()
-  {
-    // Clear the page
-    // Set the page to 0
-
+  void clearPages() {
     currentPage = 0;
-
-    // for (int i = 0; i < MAX_PAGE+1; i++)
-    // {
-    //   free(pageBuffer);
-    // }
     initializeMemory();
   }
 
@@ -591,7 +585,7 @@ public:
       // cout << "PAGE COUNT: " << pgCount << " " << n << endl;
       memory = pageBufferTmp;
       int *val = (int *)(memory + BLOCK_SIZE - intSize);
-      int *val2 = (int *)(memory + BLOCK_SIZE - intSize * 2);
+      int *val2 = (int *)(memory + BLOCK_SIZE - intSize * 3);
       int itemCount = *val2;
       // if (*val == 0) {
       //   break;
@@ -599,9 +593,8 @@ public:
       // cout << "Print Size val: " << *val << " __" << *val2 << endl;
 
       int sum = 0;
-      for (int i = 0; i < itemCount; i++)
-      {
-        int *val3 = (int *)(memory + BLOCK_SIZE - intSize * 3 - intSize * i);
+      for (int i = 0; i < itemCount; i++) {
+        int *val3 = (int *)(memory + BLOCK_SIZE - intSize * 4 - intSize * i);
         // cout << "Print Size val3 : " << *val3 << " __" << endl;
         char *val4 = (char *)malloc(*val3);
         memcpy(val4, memory + sum, *val3);
