@@ -177,6 +177,7 @@ class LinearHashIndex {
       }
     }
   }
+
   void insertRecord(Record record) {
     //-------------------------------------- mod , cut string
     ni++;
@@ -207,7 +208,7 @@ class LinearHashIndex {
       //  cout << "After n " << n << endl;
 
       //====================================================ADD ID and OFFSET to
-      //bucket==============================================================================
+      // bucket==============================================================================
       int id = n;
       int offset = n;
       BucketIndex Btest(id, offset);
@@ -254,7 +255,7 @@ class LinearHashIndex {
   void setBucket(int numberOfn) {
     for (int x = 0; x < numberOfn; x++) {
       //====================================================ADD ID and OFFSET to
-      //bucket==============================================================================
+      // bucket==============================================================================
       int id = x;
       int offset = x;
       BucketIndex Btest(id, offset);
@@ -428,6 +429,14 @@ class StorageBufferManager {
     // cout << "VALUE =" << *val << " " << *val2 << " " << *val3 << endl;
   }
 
+  void deleteRecordFromMemory(int index) {
+    // delete the record from memory
+    // update the last slot in page which is the free position
+    // update the length of the record to slot
+    // update record count to slot
+    // update the length of the block to slot
+  }
+
   void insertRecord(Record record) {
     if (numRecords == 0) {
       initializeMemory();
@@ -467,6 +476,74 @@ class StorageBufferManager {
   }
 
   // loop print value in pageBuffer[2]
+
+  void writeFileAt(unsigned char *buffer, int page) {
+    int offsetAt = 4096 * page;
+    file.open(fileName, std::ios::binary | std::ios::out);
+    file.seekp(BLOCK_SIZE * page);
+    file.write((char *)pageBuffer[page], BLOCK_SIZE);
+    file.close();
+  }
+
+  void removeRecordFromMemory(unsigned char *buffer, int id) {
+    int *freeBlock = (int *)(memory + BLOCK_SIZE - intSize);
+    int *itemCount = (int *)(memory + BLOCK_SIZE - intSize * 3);
+    int currentPosition = *freeBlock;
+    for (int i = 0; i < *itemCount; i++) {
+      int *recordLen = (int *)(memory + BLOCK_SIZE - intSize * 4 - intSize * i);
+      char *record = (char *)malloc(*recordLen);
+      memcpy(record, memory + currentPosition, *recordLen);
+      currentPosition += *recordLen;
+      // get record
+      vector<string> fields;
+      string str = string(record);
+      stringstream ss(str);
+      string field;
+      while (std::getline(ss, field, '$')) {
+        fields.push_back(field);
+      }
+    }
+  }
+
+  void readAtMemoryIndex() {
+    int page = 2;
+    int offsetAt = 4096 * page;
+    // declare local page buffer
+    unsigned char *pageBufferTmp =
+        static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
+
+    file.open(fileName, std::ios::binary | std::ios::in);
+    file.seekg(offsetAt);
+    file.read((char *)pageBufferTmp, BLOCK_SIZE);
+
+    cout << "Read at Memory Index" << endl;
+    cout << "Page: " << page << endl;
+    cout << "Offset: " << offsetAt << endl;
+    // loop through the page buffer by reading the end of offset
+    memory = pageBufferTmp;
+    int *val = (int *)(memory + BLOCK_SIZE - intSize);
+    int *val2 = (int *)(memory + BLOCK_SIZE - intSize * 3);
+    int itemCount = *val2;
+    int sum = 0;
+    for (int i = 0; i < itemCount; i++) {
+      cout << "ITEM COUNT: " << itemCount << " " << i << endl;
+      int *val3 = (int *)(memory + BLOCK_SIZE - intSize * 4 - intSize * i);
+      // cout << "Print Size val3 : " << *val3 << " __" << endl;
+      char *val4 = (char *)malloc(*val3);
+      memcpy(val4, memory + sum, *val3);
+      sum += *val3;
+      // cout << val4 << endl;
+
+      vector<string> fields;
+      string str = string(val4);
+      stringstream ss(str);
+      string field;
+      while (std::getline(ss, field, '$')) {
+        fields.push_back(field);
+      }
+      cout << "ID: " << fields[0] << endl;
+    }
+  }
 
   void writePageBufferToFile() {
     for (int i = 0; i < MAX_PAGE; i++) {
