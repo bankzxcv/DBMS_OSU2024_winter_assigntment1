@@ -5,81 +5,60 @@
 #include <iostream>
 #include <sstream>
 #include <bitset>
-#include <fstream> // Include the necessary header file for the getline function
+#include <fstream>  // Include the necessary header file for the getline function
 #include <map>
 #include <cstdio>
 #include <cstdlib>
 #include <list>
-#define intSize sizeof(int) // int size
+#define intSize sizeof(int)  // int size
 using namespace std;
 #define MAX 216
 
-class BucketIndex
-{
-private:
+class BucketIndex {
+ public:
   int Id, Offset;
 
-public:
-  BucketIndex(int id, int offset)
-  {
+  BucketIndex(int id, int offset) {
     Id = id;
     Offset = offset;
   }
-  void setOffset(int offset)
-  {
-    Offset = offset;
-  }
-  void setId(int id)
-  {
-    Id = id;
-  }
-  int getOffset()
-  {
-    return Offset;
-  }
-  int getId()
-  {
-    return Id;
-  }
+  void setOffset(int offset) { Offset = offset; }
+  void setId(int id) { Id = id; }
+  int getOffset() { return Offset; }
+  int getId() { return Id; }
 
-  void print()
-  {
+  void print() {
     cout << "\tID: " << Id << "\n";
     cout << "\tOffset: " << Offset << "\n";
   }
 };
 
-class Record
-{
-public:
+class Record {
+ public:
   int id, manager_id;
   std::string bio, name;
 
-  Record(vector<std::string> fields)
-  {
+  Record(vector<std::string> fields) {
     id = stoi(fields[0]);
     name = fields[1];
     bio = fields[2];
     manager_id = stoi(fields[3]);
   }
 
-  std::vector<char> serializeToString()
-  {
+  std::vector<char> serializeToString() {
     cout << "name: " << name << endl;
     string serialStr = to_string(id) + "$" + name + "$" + bio + "$" +
                        to_string(manager_id) + "$";
     vector<char> serial = {};
 
-    for (int j = 0; j < serialStr.size(); j++)
-    {
+    for (int j = 0; j < serialStr.size(); j++) {
       serial.push_back(serialStr[j]);
     }
     // Add the record to the memory
     return serial;
   }
 
-  void print()
-  {
+  void print() {
     cout << "\tID: " << id << "\n";
     cout << "\tNAME: " << name << "\n";
     cout << "\tBIO: " << bio << "\n";
@@ -87,8 +66,7 @@ public:
   }
 };
 
-string toBinary(int n)
-{
+string toBinary(int n) {
   if (n == 0)
     return "0";
   else if (n == 1)
@@ -99,34 +77,33 @@ string toBinary(int n)
     return toBinary(n / 2) + "1";
 }
 
-class LinearHashIndex
-{
-private:
+class LinearHashIndex {
+ private:
   const int BLOCK_SIZE = 4096;
   const int MAX_PAGE = 3;
   map<string, int> mp;
-  vector<BucketIndex> bucket; // Map the least-significant-bits of h(id) to a bucket
-                              // location in EmployeeIndex (e.g., the jth bucket) can
-                              // scan to correct bucket using j*BLOCK_SIZE as offset
-                              // (using seek function) can initialize to a size of 256
-                              // (assume that we will never have more than 256 regular
-                              // (i.e., non-overflow) buckets)
-  int n;                      // The number of indexes in bucket currently being used
-  int i;                      // The number of least-significant-bits of h(id) to check. Will need
-                              // to increase i once n > 2^i
-  int numRecords;             // Records currently in index. Used to test whether to
-                              // increase n
-  int nextFreeBlock;          // Next place to write a bucket. Should increment it by
-                              // BLOCK_SIZE whenever a bucket is written to
-                              // EmployeeIndex
-  string fName;               // Name of index file
-  int currentPageSize = 0;    // not more tehn 4096
-  int currentPage = 0;        // 0,1,2
+  vector<BucketIndex>
+      bucket;  // Map the least-significant-bits of h(id) to a bucket
+               // location in EmployeeIndex (e.g., the jth bucket) can
+               // scan to correct bucket using j*BLOCK_SIZE as offset
+               // (using seek function) can initialize to a size of 256
+               // (assume that we will never have more than 256 regular
+               // (i.e., non-overflow) buckets)
+  int n;       // The number of indexes in bucket currently being used
+  int i;  // The number of least-significant-bits of h(id) to check. Will need
+          // to increase i once n > 2^i
+  int numRecords;     // Records currently in index. Used to test whether to
+                      // increase n
+  int nextFreeBlock;  // Next place to write a bucket. Should increment it by
+                      // BLOCK_SIZE whenever a bucket is written to
+                      // EmployeeIndex
+  string fName;       // Name of index file
+  int currentPageSize = 0;  // not more tehn 4096
+  int currentPage = 0;      // 0,1,2
 
   std::ofstream file;
 
-  void setNextPage()
-  {
+  void setNextPage() {
     currentPage++;
     currentPageSize = 0;
     // memory = pageBuffer[currentPage];
@@ -135,26 +112,21 @@ private:
 
   string IdBinary = "";
 
-  void convertToBinary(unsigned int n)
-  {
-    if (n / 2 != 0)
-    {
+  void convertToBinary(unsigned int n) {
+    if (n / 2 != 0) {
       convertToBinary(n / 2);
     }
     IdBinary = IdBinary + to_string(n % 2);
     // printf("%d", n % 2);
   }
 
-  string decToBinaryInStringAndAddZero(int n)
-  {
+  string decToBinaryInStringAndAddZero(int n) {
     // array to store binary number
     int binaryNum[32];
 
     // counter for binary array
     int z = 0;
-    while (n > 0)
-    {
-
+    while (n > 0) {
       // storing remainder in binary array
       binaryNum[z] = n % 2;
       n = n / 2;
@@ -163,8 +135,7 @@ private:
     string ans = "";
 
     // printing binary array in reverse order
-    for (int j = z - 1; j >= 0; j--)
-    {
+    for (int j = z - 1; j >= 0; j--) {
       auto s = std::to_string(binaryNum[j]);
       ans = ans + "" + s;
       // cout << binaryNum[j];
@@ -174,11 +145,9 @@ private:
     //      << "ans.length() " << ans.length() << endl
     //      << "i " << i << endl;
 
-    if (ans.length() != i)
-    {
+    if (ans.length() != i) {
       // cout << "if (ans.length() != i) " << endl;
-      for (int c = ans.length(); c < i; c++)
-      {
+      for (int c = ans.length(); c < i; c++) {
         ans = "0" + ans;
       }
     }
@@ -186,39 +155,32 @@ private:
 
     return ans;
   }
-  string doBitfilp(string inputId)
-  {
-
+  string doBitfilp(string inputId) {
     string ans = inputId;
-    //cout << "!ans[] =  " << (!ans.at(0)) << endl;
+    // cout << "!ans[] =  " << (!ans.at(0)) << endl;
 
-    //cout << "befor filp  " << ans << endl;
-    if ((ans.at(0)) == 0)
-    {
+    // cout << "befor filp  " << ans << endl;
+    if ((ans.at(0)) == 0) {
       ans[0] = '1';
-    }
-    else
-    {
+    } else {
       ans[0] = '0';
     }
 
-    //cout << "after filp  " << ans << endl;
+    // cout << "after filp  " << ans << endl;
     return ans;
   }
   int ni = 0;
   // Insert new record into index
-  void checkBucketidMatchInputid(string inputId)
-  {
-    cout << endl
-         << "checkBucketidMatchInputid" << endl;
-    for (auto element : bucket)
-    {
+  void checkBucketidMatchInputid(string inputId) {
+    cout << endl << "checkBucketidMatchInputid" << endl;
+    for (auto element : bucket) {
       // cout << "element " << element << endl;
-      string BucketIndexInBinary = decToBinaryInStringAndAddZero(element.getId());
+      string BucketIndexInBinary =
+          decToBinaryInStringAndAddZero(element.getId());
       // cout << endl;
-      if (BucketIndexInBinary == inputId)
-      {
-        cout << "-----------------------------------------------------------" << endl;
+      if (BucketIndexInBinary == inputId) {
+        cout << "-----------------------------------------------------------"
+             << endl;
         cout << endl
              << "I Found it \n inputId :" << inputId << " macth with :" << BucketIndexInBinary << endl;
         cout << "-----------------------------------------------------------" << endl;
@@ -240,8 +202,8 @@ private:
       }
     }
   }
-  void insertRecord(Record record)
-  {
+
+  void insertRecord(Record record) {
     //-------------------------------------- mod , cut string
     ni++;
     printf("insert_Each_data (%d)\n", ni);
@@ -249,10 +211,8 @@ private:
     convertToBinary(record.id);
     cout << "IdBinary " << IdBinary << endl;
     string NewIdBinaryAfterMod = "";
-    for (int j = 0; j < IdBinary.length(); j++)
-    {
-      if (IdBinary.length() - j < 9)
-      {
+    for (int j = 0; j < IdBinary.length(); j++) {
+      if (IdBinary.length() - j < 9) {
         NewIdBinaryAfterMod = NewIdBinaryAfterMod + IdBinary[j];
       }
     }
@@ -265,13 +225,15 @@ private:
     cout << "Cut only = I " << ResultIndexAfterCut << endl;
 
     //--------------------------------------
-    if (ni == 40) // <total_number_of_bytes_stored> /(4KB*<number_of_non_overflow_pages>
+    if (ni == 40)  // <total_number_of_bytes_stored>
+                   // /(4KB*<number_of_non_overflow_pages>
     {
       // cout << "before n " << n << endl;
       n++;
       //  cout << "After n " << n << endl;
 
-      //====================================================ADD ID and OFFSET to bucket==============================================================================
+      //====================================================ADD ID and OFFSET to
+      // bucket==============================================================================
       int id = n;
       int offset = n;
       BucketIndex Btest(id, offset);
@@ -299,11 +261,8 @@ private:
     //  rBianry = after to binary
 
     // No records written to index yet
-    if (numRecords == 0)
-    {
-    }
-    else
-    {
+    if (numRecords == 0) {
+    } else {
     }
 
     // Add record to the index in the correct block, creating a overflow block
@@ -314,19 +273,16 @@ private:
     // that may have been originally misplaced due to a bit flip
   }
 
-  void printBucket()
-  {
-    for (auto element : bucket)
-    {
+  void printBucket() {
+    for (auto element : bucket) {
       cout << element.getId() << element.getOffset() << endl;
     }
   }
   // add bk index
-  void setBucket(int numberOfn)
-  {
-    for (int x = 0; x < numberOfn; x++)
-    {
-      //====================================================ADD ID and OFFSET to bucket==============================================================================
+  void setBucket(int numberOfn) {
+    for (int x = 0; x < numberOfn; x++) {
+      //====================================================ADD ID and OFFSET to
+      // bucket==============================================================================
       int id = x;
       int offset = (x)*BLOCK_SIZE;
       BucketIndex Btest(id, offset);
@@ -347,11 +303,10 @@ private:
     printBucket();
   }
 
-public:
-  LinearHashIndex(string indexFileName)
-  {
-    n = 4; // Start with 4 buckets in index
-    i = 2; // Need 2 bits to address 4 buckets
+ public:
+  LinearHashIndex(string indexFileName) {
+    n = 4;  // Start with 4 buckets in index
+    i = 2;  // Need 2 bits to address 4 buckets
     numRecords = 0;
     nextFreeBlock = 0;
     fName = indexFileName;
@@ -363,28 +318,24 @@ public:
   }
 
   // Read csv file and add records to the index
-  void createFromFile(string csvFName)
-  {
+  void createFromFile(string csvFName) {
     // Add records to the EmployeeRelation
 
     std::ifstream csvFile(csvFName);
     // Read the file and add records to the EmployeeRelation
     // file = std::ofstream(fName, std::ios::out | std::ios::binary);
     file.open(fName, std::ios::out | std::ios::binary);
-    if (!csvFile.is_open())
-    {
+    if (!csvFile.is_open()) {
       return;
     }
     string line;
     cout << "CREATED FILE" << endl;
-    while (std::getline(csvFile, line, '\n'))
-    {
+    while (std::getline(csvFile, line, '\n')) {
       // Split the line into fields
       vector<string> fields;
       stringstream ss(line);
       string field;
-      while (std::getline(ss, field, ','))
-      {
+      while (std::getline(ss, field, ',')) {
         fields.push_back(field);
       }
       // cout << fields[0] << endl;
@@ -398,8 +349,7 @@ public:
     csvFile.close();
   }
   // Given an ID, find the relevant record and print it
-  Record findRecordById(int index)
-  {
+  Record findRecordById(int index) {
     cout << "Finding record with id: " << index << endl;
     // load file
     // get hash index table
@@ -409,10 +359,9 @@ public:
   }
 };
 
-class StorageBufferManager
-{
-private:
-  const int BLOCK_SIZE = 4096; // initialize the  block size allowed in main
+class StorageBufferManager {
+ private:
+  const int BLOCK_SIZE = 4096;  // initialize the  block size allowed in main
   const int MAX_PAGE = 3;
   // You may declare variables based on your need
   int numRecords = 0;
@@ -440,31 +389,27 @@ private:
 
   // create number of Position in each pages
   // create a current page number to show that what is the current page
-  int currentPage = 0; // page 0, 1, 2 due to 3 pages possible
+  int currentPage = 0;  // page 0, 1, 2 due to 3 pages possible
   int currentLength = 0;
 
   // Insert new record
-  void setNextPage()
-  {
+  void setNextPage() {
     currentPage++;
     currentLength = 0;
     memory = pageBuffer[currentPage];
     setLastRecord();
   }
 
-  void setLastRecord()
-  {
+  void setLastRecord() {
     lastRecord = (int *)(memory + BLOCK_SIZE - sizeof(int));
     recordCount = (int *)(memory + BLOCK_SIZE - sizeof(int) * 3);
     *lastRecord = 0;
     *recordCount = 0;
   }
 
-  void initializeMemory()
-  {
+  void initializeMemory() {
     // Initialize the memory
-    for (int i = 0; i < MAX_PAGE + 1; i++)
-    {
+    for (int i = 0; i < MAX_PAGE + 1; i++) {
       // free(pageBuffer[i]);
       pageBuffer[i] = static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
     }
@@ -472,17 +417,14 @@ private:
     setLastRecord();
   }
 
-  void insertToMemory(std::vector<char> record)
-  {
+  void insertToMemory(std::vector<char> record) {
     size_t recordLen = record.size();
-    for (int i = 0; i < recordLen; i++)
-    {
+    for (int i = 0; i < recordLen; i++) {
       memory[currentLength + i] = record[i];
     }
     currentLength += recordLen;
     unsigned char *tmp = (unsigned char *)malloc(recordLen);
-    for (int i = 0; i < recordLen; i++)
-    {
+    for (int i = 0; i < recordLen; i++) {
       tmp[i] = memory[currentLength - recordLen + i];
     }
 
@@ -514,10 +456,8 @@ private:
     // cout << "VALUE =" << *val << " " << *val2 << " " << *val3 << endl;
   }
 
-  void insertRecord(Record record)
-  {
-    if (numRecords == 0)
-    {
+  void insertRecord(Record record) {
+    if (numRecords == 0) {
       initializeMemory();
     }
     numRecords++;
@@ -528,15 +468,13 @@ private:
     // Serialize the record and insert record to memory
     std::vector<char> r = record.serializeToString();
     if (r.size() + currentLength >
-        BLOCK_SIZE - sizeof(int) * (4 + (*recordCount)))
-    {
+        BLOCK_SIZE - sizeof(int) * (4 + (*recordCount))) {
       cout << numRecords << " " << r.size() << " " << currentLength << " "
            << BLOCK_SIZE - sizeof(int) * (4 + (*recordCount)) << endl;
       setNextPage();
     }
 
-    if (currentPage == MAX_PAGE)
-    {
+    if (currentPage == MAX_PAGE) {
       cout << "Write Pages buffer to file" << endl;
       writePageBufferToFile();
       isWritten = true;
@@ -545,52 +483,232 @@ private:
     insertToMemory(r);
   }
 
-  void clearPages()
-  {
+  void clearPages() {
     currentPage = 0;
     initializeMemory();
   }
 
-public:
-  StorageBufferManager(string NewFileName)
-  {
+ public:
+  StorageBufferManager(string NewFileName) {
     // initialize your variables
     fileName = NewFileName;
   }
 
   // loop print value in pageBuffer[2]
 
-  void writePageBufferToFile()
-  {
-    for (int i = 0; i < MAX_PAGE; i++)
-    {
+  void writeFileAt(unsigned char *buffer, int page) {
+    // int offsetAt = 4096 * page;
+    int offsetAt = 4096 * page;
+    file.open(fileName, std::ios::binary | std::ios::in | std::ios::out);
+    file.seekp(offsetAt, std::ios::beg);
+    file.write((char *)buffer, BLOCK_SIZE);
+    file.close();
+  }
+
+  bool findRecordById(int id, int page) {
+    unsigned char *buffer =
+        static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
+    int offsetAt = 4096 * page;
+    file.open(fileName, std::ios::binary | std::ios::in);
+    file.seekg(offsetAt);
+    file.read((char *)buffer, BLOCK_SIZE);
+    int *freeBlock = (int *)(buffer + BLOCK_SIZE - intSize);
+    int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
+    if (*itemCount == NULL || *itemCount == 0) {
+      return false;
+    }
+    int currentPosition = 0;
+    for (int i = 0; i < *itemCount; i++) {
+      int *recordLen = (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * i);
+      cout << "Record Length: " << *recordLen << endl;
+      char *record = (char *)malloc(*recordLen);
+      memcpy(record, buffer + currentPosition, *recordLen);
+      vector<string> fields;
+      string str = string(record);
+      stringstream ss(str);
+      string field;
+      while (std::getline(ss, field, '$')) {
+        fields.push_back(field);
+      }
+      cout << "ID: " << fields[0] << " Target = " << id << " i=" << i << endl;
+      free(record);
+      if (stoi(fields[0]) == id) {
+        return true;
+      }
+      // check if it has overflow page
+      currentPosition += *recordLen;
+    }
+    // check overflow page
+    int *isPageOverFlow = (int *)(buffer + BLOCK_SIZE - intSize * 2);
+    if (*isPageOverFlow != -1) {
+      int *nextPage = (int *)(buffer + BLOCK_SIZE - intSize * 2);
+      return findRecordById(id, page + 216);
+    }
+    return false;
+  }
+
+  int getSizeOfPage(int page) {
+    unsigned char *buffer =
+        static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
+    int offsetAt = 4096 * page;
+    file.open(fileName, std::ios::binary | std::ios::in);
+    file.seekg(offsetAt);
+    file.read((char *)buffer, BLOCK_SIZE);
+    file.close();
+    int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
+    int sizeOfOffset = intSize * 3 + intSize * (*itemCount);
+    int *isPageOverFlow = (int *)(buffer + BLOCK_SIZE - intSize * 2);
+    if (*isPageOverFlow != -1) {
+      sizeOfOffset += getSizeOfPage(page + 216);
+    }
+    return sizeOfOffset;
+  }
+
+  void insertToMemoryPage(Record item, int page) {
+    vector<char> r = item.serializeToString();
+    unsigned char *buffer =
+        static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
+    int offsetAt = 4096 * page;
+    file.open(fileName, std::ios::binary | std::ios::in);
+    file.seekg(offsetAt);
+    file.read((char *)buffer, BLOCK_SIZE);
+    file.close();
+    int *lastBlock = (int *)(buffer + BLOCK_SIZE - intSize);
+    int *isOverflow = (int *)(buffer + BLOCK_SIZE - intSize * 2);
+    int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
+    int currentPosition = 0;
+    // if new page
+    if (*itemCount == NULL || *itemCount == 0) {
+      int *lastBlock = (int *)(buffer + BLOCK_SIZE - intSize);
+      int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
+      memcpy(buffer + currentPosition, item.serializeToString().data(),
+             item.serializeToString().size());
+      *lastBlock = item.serializeToString().size();
+      *itemCount = 1;
+    } else {
+      for (int i = 0; i < *itemCount; i++) {
+        int *recordLen =
+            (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * i);
+        currentPosition += *recordLen;
+      }
+      // if overflow
+      int sizeOfOffset = intSize * 3 + intSize * (*itemCount);
+      if (currentPosition + item.serializeToString().size() + sizeOfOffset >
+          BLOCK_SIZE) {
+        *isOverflow = 1;
+        int *nextPage = (int *)(buffer + BLOCK_SIZE - intSize * 2);
+        if (*nextPage == -1) {
+          *nextPage = page + 216;
+        }
+        writeFileAt(buffer, page);
+        free(buffer);
+        insertToMemoryPage(item, page + 216);
+        return;
+      }
+
+      memcpy(buffer + currentPosition, item.serializeToString().data(),
+             item.serializeToString().size());
+      *lastBlock += item.serializeToString().size();
+      *itemCount += 1;
+    }
+    writeFileAt(buffer, page);
+  }
+
+  void removeRecordFromMemoryPage(int id, int page) {
+    int isOverflow = page > 216 ? 1 : 0;
+    unsigned char *buffer =
+        static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
+    int offsetAt = 4096 * page;
+    file.open(fileName, std::ios::binary | std::ios::in);
+    file.seekg(offsetAt);
+    file.read((char *)buffer, BLOCK_SIZE);
+    file.close();
+    int *freeBlock = (int *)(buffer + BLOCK_SIZE - intSize);
+    int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
+    cout << "Free Block: " << *freeBlock << endl;
+    cout << "Item Count: " << *itemCount << endl;
+    int currentPosition = 0;
+    for (int i = 0; i < *itemCount; i++) {
+      int *recordLen = (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * i);
+      cout << "Record Length: " << *recordLen << endl;
+      char *record = (char *)malloc(*recordLen);
+      memcpy(record, buffer + currentPosition, *recordLen);
+      vector<string> fields;
+      string str = string(record);
+      stringstream ss(str);
+      string field;
+      while (std::getline(ss, field, '$')) {
+        fields.push_back(field);
+      }
+      cout << "ID: " << fields[0] << " Target = " << id << " i=" << i << endl;
+      free(record);
+      if (stoi(fields[0]) == id) {
+        int shift = currentPosition + *recordLen;
+        int shiftLen = *freeBlock - shift;
+        memcpy(buffer + currentPosition, buffer + shift, shiftLen);
+
+        *freeBlock -= *recordLen;
+        *itemCount -= 1;
+        for (int j = i; j < *itemCount; j++) {
+          int *recordLen =
+              (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * j);
+          int *recordLenNext =
+              (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * (j + 1));
+          memcpy(buffer + BLOCK_SIZE - intSize * 4 - intSize * j, recordLenNext,
+                 intSize);
+        }
+        memcpy(buffer + BLOCK_SIZE - intSize, freeBlock, intSize);
+        break;
+      }
+      currentPosition += *recordLen;
+    }
+    writeFileAt(buffer, page);
+  }
+
+  void readAtMemoryIndex() {
+    removeRecordFromMemoryPage(11432120, 0);
+    return;
+
+    int page = 0;
+    int offsetAt = 4096 * page;
+
+    // declare local page buffer
+    unsigned char *pageBufferTmp =
+        static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
+
+    file.open(fileName, std::ios::binary | std::ios::in);
+    file.seekg(offsetAt);
+    file.read((char *)pageBufferTmp, BLOCK_SIZE);
+    file.close();
+    removeRecordFromMemoryPage(11432120, 0);
+    removeRecordFromMemoryPage(11432120, 0);
+  }
+
+  void writePageBufferToFile() {
+    for (int i = 0; i < MAX_PAGE; i++) {
       cout << "Writing to file at Page " << i + 1 << endl;
       file.write((char *)(pageBuffer[i]), BLOCK_SIZE);
     }
   }
 
   // Read csv file (Employee.csv) and add records to the (EmployeeRelation)
-  void createFromFile(string csvFName)
-  {
+  void createFromFile(string csvFName) {
     // Add records to the EmployeeRelation
     std::fstream csvFile;
     // Read the file and add records to the EmployeeRelation
     // file = std::ofstream(fileName, std::ios::binary | std::ios::out);
     file.open(fileName, std::ios::binary | std::ios::out);
     csvFile.open(csvFName, std::ios::in);
-    if (!csvFile.is_open())
-    {
+    if (!csvFile.is_open()) {
       return;
     }
     string line;
-    while (std::getline(csvFile, line, '\n'))
-    {
+    while (std::getline(csvFile, line, '\n')) {
       // Split the line into fields
       vector<string> fields;
       stringstream ss(line);
       string field;
-      while (std::getline(ss, field, ','))
-      {
+      while (std::getline(ss, field, ',')) {
         fields.push_back(field);
       }
       // cout << fields[0] << endl;
@@ -601,8 +719,7 @@ public:
       insertRecord(record);
     }
 
-    if (isWritten == false)
-    {
+    if (isWritten == false) {
       cout << "Write Pages buffer to file...." << endl;
       writePageBufferToFile();
       isWritten = true;
@@ -614,10 +731,8 @@ public:
     clearPages();
   }
 
-  void findValue(int pgCount, int target, unsigned char *pageBufferTmp)
-  {
-    for (int n = 0; n < pgCount; n++)
-    {
+  void findValue(int pgCount, int target, unsigned char *pageBufferTmp) {
+    for (int n = 0; n < pgCount; n++) {
       // cout << "PAGE COUNT: " << pgCount << " " << n << endl;
       memory = pageBufferTmp;
       int *val = (int *)(memory + BLOCK_SIZE - intSize);
@@ -629,8 +744,7 @@ public:
       // cout << "Print Size val: " << *val << " __" << *val2 << endl;
 
       int sum = 0;
-      for (int i = 0; i < itemCount; i++)
-      {
+      for (int i = 0; i < itemCount; i++) {
         int *val3 = (int *)(memory + BLOCK_SIZE - intSize * 4 - intSize * i);
         // cout << "Print Size val3 : " << *val3 << " __" << endl;
         char *val4 = (char *)malloc(*val3);
@@ -642,14 +756,12 @@ public:
         string str = string(val4);
         stringstream ss(str);
         string field;
-        while (std::getline(ss, field, '$'))
-        {
+        while (std::getline(ss, field, '$')) {
           fields.push_back(field);
         }
         // cout << "ID: " << fields[0] << endl;
         Record record(fields);
-        if (record.id == target)
-        {
+        if (record.id == target) {
           isFound = 1;
           record.print();
           return;
@@ -658,10 +770,8 @@ public:
     }
   }
 
-  void readFromFile(int target)
-  {
-    for (int i = 0; i < MAX_PAGE; i++)
-    {
+  void readFromFile(int target) {
+    for (int i = 0; i < MAX_PAGE; i++) {
       free(pageBuffer[i]);
       pageBuffer[i] = static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
     }
@@ -669,12 +779,11 @@ public:
     // initializeMemory();
     clearPages();
     // cout << "READ FROM FILE" << endl;
-    const std::size_t ChunkSize = BLOCK_SIZE; // Define the chunk size. 4KB
+    const std::size_t ChunkSize = BLOCK_SIZE;  // Define the chunk size. 4KB
     std::fstream inFile;
     inFile.open(fileName, std::ios::binary | std::ios::in);
 
-    if (!inFile)
-    {
+    if (!inFile) {
       std::cerr << "Cannot open file for reading: " << fileName << std::endl;
       return;
     }
@@ -685,18 +794,16 @@ public:
 
     unsigned char *pageBufferTmp =
         static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
-    while (inFile.read(reinterpret_cast<char *>(buffer.data()), ChunkSize))
-    {
+    while (inFile.read(reinterpret_cast<char *>(buffer.data()), ChunkSize)) {
       // memcpy(pageBuffer[pgCount++], buffer.data(), ChunkSize);
       memcpy(pageBufferTmp, buffer.data(), ChunkSize);
       findValue(1, target, pageBufferTmp);
     }
-    inFile.close(); // Close the file.
+    inFile.close();  // Close the file.
   }
 
   // Given an ID, find the relevant record and print it
-  void findRecordById(int id)
-  {
+  void findRecordById(int id) {
     cout << "Finding record with id: " << id << endl;
     readFromFile(id);
   }
