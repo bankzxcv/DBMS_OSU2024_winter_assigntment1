@@ -480,33 +480,55 @@ class StorageBufferManager {
   void writeFileAt(unsigned char *buffer, int page) {
     int offsetAt = 4096 * page;
     file.open(fileName, std::ios::binary | std::ios::out);
-    file.seekp(BLOCK_SIZE * page);
+    file.seekp(offsetAt);
     file.write((char *)pageBuffer[page], BLOCK_SIZE);
     file.close();
   }
 
   void removeRecordFromMemory(unsigned char *buffer, int id) {
-    int *freeBlock = (int *)(memory + BLOCK_SIZE - intSize);
-    int *itemCount = (int *)(memory + BLOCK_SIZE - intSize * 3);
-    int currentPosition = *freeBlock;
+    int *freeBlock = (int *)(buffer + BLOCK_SIZE - intSize);
+    int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
+    cout << "Free Block: " << *freeBlock << endl;
+    cout << "Item Count: " << *itemCount << endl;
+    int currentPosition = 0;
     for (int i = 0; i < *itemCount; i++) {
-      int *recordLen = (int *)(memory + BLOCK_SIZE - intSize * 4 - intSize * i);
+      int *recordLen = (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * i);
+      cout << "Record Length: " << *recordLen << endl;
       char *record = (char *)malloc(*recordLen);
-      memcpy(record, memory + currentPosition, *recordLen);
-      currentPosition += *recordLen;
-      // get record
+      memcpy(record, buffer + currentPosition, *recordLen);
       vector<string> fields;
       string str = string(record);
       stringstream ss(str);
       string field;
+      cout << "-----" << endl;
       while (std::getline(ss, field, '$')) {
         fields.push_back(field);
       }
+      cout << "ID: " << fields[0] << " Target = " << id << " i=" << i << endl;
+      free(record);
+      if (stoi(fields[0]) == id) {
+        cout << "Found" << endl;
+        int shift = currentPosition + *recordLen;
+        int shiftLen = *freeBlock - shift;
+        cout << "Shift: " << shift << " " << shiftLen << endl;
+        memcpy(buffer + currentPosition, buffer + shift, shiftLen);
+
+        *freeBlock -= *recordLen;
+        *itemCount -= 1;
+        for(int j=i; j < *itemCount; j++){
+          int *recordLen = (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * j);
+          int *recordLenNext = (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * (j+1));
+          memcpy(buffer + BLOCK_SIZE - intSize * 4 - intSize * j, recordLenNext, intSize);
+        }
+        memcpy(buffer + BLOCK_SIZE - intSize, freeBlock, intSize);
+        break;
+      }
+      currentPosition += *recordLen;
     }
   }
 
   void readAtMemoryIndex() {
-    int page = 2;
+    int page = 0;
     int offsetAt = 4096 * page;
     // declare local page buffer
     unsigned char *pageBufferTmp =
@@ -539,10 +561,15 @@ class StorageBufferManager {
       stringstream ss(str);
       string field;
       while (std::getline(ss, field, '$')) {
+        // cout << field << endl;
         fields.push_back(field);
       }
-      cout << "ID: " << fields[0] << endl;
+      // cout << "ID: " << fields[0] << endl;
+      // test remove record
     }
+    removeRecordFromMemory(memory, 11432120);
+    removeRecordFromMemory(memory, 11432116);
+    removeRecordFromMemory(memory, 114);
   }
 
   void writePageBufferToFile() {
