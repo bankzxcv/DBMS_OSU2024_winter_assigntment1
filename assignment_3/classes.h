@@ -182,20 +182,22 @@ class LinearHashIndex {
         cout << "-----------------------------------------------------------"
              << endl;
         cout << endl
-             << "I Found it \n inputId :" << inputId
-             << " macth with :" << BucketIndexInBinary << endl;
-        cout << "-----------------------------------------------------------"
-             << endl;
-      } else if (doBitfilp(inputId) == BucketIndexInBinary)  // doBitfilp
+             << "I Found it \n inputId :" << inputId << " macth with :" << BucketIndexInBinary << endl;
+        cout << "-----------------------------------------------------------" << endl;
+         //add record to that page
+      }
+      else if (doBitfilp(inputId) == BucketIndexInBinary) // doBitfilp
       {
         //======== doBitfilp ========
         cout << "------------------doBitfilp-----------------" << endl;
         cout << endl
-             << "I Found it \n inputId :" << inputId
-             << " macth with :" << BucketIndexInBinary << endl;
-        cout << "-----------------------------------------------------------"
-             << endl;
-      } else {
+             << "I Found it \n inputId :" << inputId << " macth with :" << BucketIndexInBinary << endl;
+        cout << "-----------------------------------------------------------" << endl;
+
+        //add record to that page
+      }
+      else
+      {
         //========Not found ========
       }
     }
@@ -236,8 +238,10 @@ class LinearHashIndex {
       int offset = n;
       BucketIndex Btest(id, offset);
       bucket.push_back(Btest);
-
-      if (n > 2 ^ i) {
+      //chcek bitfilp of i page and update to correctly
+      
+      if (n > 2 ^ i)
+      {
         //  cout << "before i " << i << endl;
         i++;
         //  cout << "After i " << i << endl;
