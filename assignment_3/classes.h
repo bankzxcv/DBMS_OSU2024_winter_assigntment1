@@ -131,7 +131,7 @@ private:
     {
       auto s = std::to_string(binaryNum[j]);
       ans = ans + "" + s;
-      cout << binaryNum[j];
+      // cout << binaryNum[j];
     }
     // cout << endl
     //      << "ans Before " << ans << endl
@@ -168,6 +168,10 @@ private:
              << "I Found it \n inputId :" << inputId << " macth with :" << BucketIndexInBinary << endl;
         cout << "-----------------------------------------------------------" << endl;
       }
+      else
+      {
+         //========Not found ========
+      }
     }
   }
   void insertRecord(Record record)
@@ -177,7 +181,7 @@ private:
     printf("insert_Each_data (%d)\n", ni);
     std::vector<char> r = record.serializeToString();
     convertToBinary(record.id);
-    cout << IdBinary << endl;
+    cout << "IdBinary " << IdBinary << endl;
     string NewIdBinaryAfterMod = "";
     for (int j = 0; j < IdBinary.length(); j++)
     {
@@ -192,7 +196,7 @@ private:
 
     string ResultIndexAfterCut = NewIdBinaryAfterMod.substr(
         NewIdBinaryAfterMod.length() - i, NewIdBinaryAfterMod.length());
-    cout << ResultIndexAfterCut << endl;
+    cout << "Cut only = I " << ResultIndexAfterCut << endl;
 
     //--------------------------------------
     if (ni == 40) // <total_number_of_bytes_stored> /(4KB*<number_of_non_overflow_pages>
@@ -215,9 +219,6 @@ private:
     // Check ID match with BucketID
     checkBucketidMatchInputid(ResultIndexAfterCut);
 
-    if (ResultIndexAfterCut == "0")
-    {
-    }
     //----------------------------------------------------------------------
 
     // record.print();
