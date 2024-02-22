@@ -222,6 +222,7 @@ private:
         cout << endl
              << "I Found it \n inputId :" << inputId << " macth with :" << BucketIndexInBinary << endl;
         cout << "-----------------------------------------------------------" << endl;
+         //add record to that page
       }
       else if (doBitfilp(inputId) == BucketIndexInBinary) // doBitfilp
       {
@@ -230,6 +231,8 @@ private:
         cout << endl
              << "I Found it \n inputId :" << inputId << " macth with :" << BucketIndexInBinary << endl;
         cout << "-----------------------------------------------------------" << endl;
+
+        //add record to that page
       }
       else
       {
