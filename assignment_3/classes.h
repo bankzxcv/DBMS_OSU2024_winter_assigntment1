@@ -97,15 +97,6 @@ private:
     // setLastRecord();
   }
 
-  int hashCode(int key, int SIZE) { return key % SIZE; }
-
-  void printbinchar(char character)
-  {
-    char output[9];
-    // itoa(character, output, 2);
-    // printf("%s - %c\n", output,character);
-  }
-
   string IdBinary = "";
 
   void convertToBinary(unsigned int n)
@@ -118,8 +109,67 @@ private:
     // printf("%d", n % 2);
   }
 
+  string decToBinaryInString(int n)
+  {
+    // array to store binary number
+    int binaryNum[32];
+
+    // counter for binary array
+    int z = 0;
+    while (n > 0)
+    {
+
+      // storing remainder in binary array
+      binaryNum[z] = n % 2;
+      n = n / 2;
+      z++;
+    }
+    string ans = "";
+
+    // printing binary array in reverse order
+    for (int j = z - 1; j >= 0; j--)
+    {
+      auto s = std::to_string(binaryNum[j]);
+      ans = ans + "" + s;
+      cout << binaryNum[j];
+    }
+    // cout << endl
+    //      << "ans Before " << ans << endl
+    //      << "ans.length() " << ans.length() << endl
+    //      << "i " << i << endl;
+
+    if (ans.length() != i)
+    {
+      // cout << "if (ans.length() != i) " << endl;
+      for (int c = ans.length(); c < i; c++)
+      {
+        ans = "0" + ans;
+      }
+    }
+    // cout << endl << "ans After " << ans << endl;
+
+    return ans;
+  }
   int ni = 0;
   // Insert new record into index
+  void checkBucketidMatchInputid(string inputId)
+  {
+    cout << endl
+         << "checkBucketidMatchInputid" << endl;
+    for (auto element : bucket)
+    {
+      // cout << "element " << element << endl;
+      string BucketIndexInBinary = decToBinaryInString(element);
+      // cout << endl;
+      if (BucketIndexInBinary == inputId)
+      {
+        cout << "-----------------------------------------------------------" << endl;
+        cout << endl
+             << "I Found it \n inputId :" << inputId << " macth with :" << BucketIndexInBinary << endl;
+        cout << "-----------------------------------------------------------" << endl;
+      }
+    }
+  }
   void insertRecord(Record record)
   {
     //-------------------------------------- mod , cut string
@@ -140,46 +190,34 @@ private:
 
     IdBinary = "";
 
-    string indexAfterCut = NewIdBinaryAfterMod.substr(
+    string ResultIndexAfterCut = NewIdBinaryAfterMod.substr(
         NewIdBinaryAfterMod.length() - i, NewIdBinaryAfterMod.length());
-    cout << indexAfterCut << endl;
-    // cout << "sdfsfsdfsdfsdfsdfsdf" << endl;
+    cout << ResultIndexAfterCut << endl;
+
     //--------------------------------------
     if (ni == 40) // <total_number_of_bytes_stored> /(4KB*<number_of_non_overflow_pages>
     {
-      cout << "before n " << n << endl;
+      // cout << "before n " << n << endl;
       n++;
-      cout << "After n " << n << endl;
-      bucket.push_back(n-1);
+      //  cout << "After n " << n << endl;
+      bucket.push_back(n - 1);
       if (n > 2 ^ i)
       {
-        cout << "before i " << i << endl;
+        //  cout << "before i " << i << endl;
         i++;
-        cout << "After i " << i << endl;
+        //  cout << "After i " << i << endl;
       }
       printBucket();
-    }
-    map<string, int>::iterator it = mp.begin();
-
-    // Iterate through the map and print the elements
-
-    while (it != mp.end())
-    {
-      // cout << "it->first: " << it->first << ", NewIdBinaryAfterMod: " <<
-      // indexAfterCut << endl;
-      // if (it->first == indexAfterCut)
-      // {
-      //   cout << "Key: " << it->first << ", Value: " << it->second << endl;
-      // }
-      cout << "Key: " << it->first << ", Value: " << it->second << endl;
-
-      ++it;
     }
 
     NewIdBinaryAfterMod = "";
     //----------------------------------------------------------------------
-    // Insert some values into the map
+    // Check ID match with BucketID
+    checkBucketidMatchInputid(ResultIndexAfterCut);
 
+    if (ResultIndexAfterCut == "0")
+    {
+    }
     //----------------------------------------------------------------------
 
     // record.print();
@@ -189,58 +227,9 @@ private:
     // No records written to index yet
     if (numRecords == 0)
     {
-      // // Initialize index with first blocks (start with 4)
-
-      // struct DataItem *item = (struct DataItem *)malloc(sizeof(struct
-      // DataItem));
-
-      // item->data = data;         // offset in page
-      // item->key = rBianry % 216; // rBianry mod to get key
-      // int hashIndex = hashCode(key);
-      // // move in array until an empty or deleted cell
-      // while (hashArray[hashIndex] != NULL && hashArray[hashIndex]->key != -1)
-      // {
-      //     // go to next cell
-      //     ++hashIndex;
-
-      //     // wrap around the table
-      //     hashIndex %= SIZE;
-      // }
-
-      // hashArray[hashIndex] = item;
     }
     else
     {
-      // Serialize the record and insert record to memory
-
-      // check Size of Data + currentSizePage < Size of Total page
-      if (r.size() + currentPageSize > BLOCK_SIZE)
-      {
-        // hashCode()
-        //  DataItem x = record;
-        //************** do forget to check after add that we need to to
-        // extention or not (n++) number of pages******************
-        //  add Data to Page
-
-        // change record to binary
-        // add record to page use hash function(mod 216) that means have 216
-        // slots check i last digit that can fill in what page index if(it mod
-        // and have free slot add it) add to that page index normally if not
-        // might do overflow page
-
-        //**************** function check number of data more than 70% or some
-        // thing ****************
-        // if(add and page more than 70% do extention increase n (number of
-        // page) and if effect to I number (do it)) n++ if j++ change n Ex. n=4
-        // , i =2 and n++, j++, (00,01,10,11) ---> n=5 , i =3
-        // (000,001,010,011,100) check Bitfilp reslot data else i not ++ change
-        // only n -> n++
-        //  check Bitfilp
-        //  reslot data
-        // else
-        // passssss
-      }
-      // check Size of Data + currentSizePage > Size of Total page
     }
 
     // Add record to the index in the correct block, creating a overflow block
