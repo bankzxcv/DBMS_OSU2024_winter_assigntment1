@@ -13,6 +13,41 @@
 #define intSize sizeof(int) // int size
 using namespace std;
 #define MAX 216
+
+class BucketIndex
+{
+public:
+  int Id, Offset;
+
+  BucketIndex(int id, int offset)
+  {
+    Id = id;
+    Offset = offset;
+  }
+  void setOffset(int offset)
+  {
+    Offset = offset;
+  }
+  void setId(int id)
+  {
+    Id = id;
+  }
+  int getOffset()
+  {
+    return Offset;
+  }
+  int getId()
+  {
+    return Id;
+  }
+
+  void print()
+  {
+    cout << "\tID: " << Id << "\n";
+    cout << "\tOffset: " << Offset << "\n";
+  }
+};
+
 class Record
 {
 public:
@@ -69,23 +104,23 @@ private:
   const int BLOCK_SIZE = 4096;
   const int MAX_PAGE = 3;
   map<string, int> mp;
-  vector<int> bucket;      // Map the least-significant-bits of h(id) to a bucket
-                           // location in EmployeeIndex (e.g., the jth bucket) can
-                           // scan to correct bucket using j*BLOCK_SIZE as offset
-                           // (using seek function) can initialize to a size of 256
-                           // (assume that we will never have more than 256 regular
-                           // (i.e., non-overflow) buckets)
-  int n;                   // The number of indexes in bucket currently being used
-  int i;                   // The number of least-significant-bits of h(id) to check. Will need
-                           // to increase i once n > 2^i
-  int numRecords;          // Records currently in index. Used to test whether to
-                           // increase n
-  int nextFreeBlock;       // Next place to write a bucket. Should increment it by
-                           // BLOCK_SIZE whenever a bucket is written to
-                           // EmployeeIndex
-  string fName;            // Name of index file
-  int currentPageSize = 0; // not more tehn 4096
-  int currentPage = 0;     // 0,1,2
+  vector<BucketIndex> bucket; // Map the least-significant-bits of h(id) to a bucket
+                              // location in EmployeeIndex (e.g., the jth bucket) can
+                              // scan to correct bucket using j*BLOCK_SIZE as offset
+                              // (using seek function) can initialize to a size of 256
+                              // (assume that we will never have more than 256 regular
+                              // (i.e., non-overflow) buckets)
+  int n;                      // The number of indexes in bucket currently being used
+  int i;                      // The number of least-significant-bits of h(id) to check. Will need
+                              // to increase i once n > 2^i
+  int numRecords;             // Records currently in index. Used to test whether to
+                              // increase n
+  int nextFreeBlock;          // Next place to write a bucket. Should increment it by
+                              // BLOCK_SIZE whenever a bucket is written to
+                              // EmployeeIndex
+  string fName;               // Name of index file
+  int currentPageSize = 0;    // not more tehn 4096
+  int currentPage = 0;        // 0,1,2
 
   std::ofstream file;
 
@@ -109,7 +144,7 @@ private:
     // printf("%d", n % 2);
   }
 
-  string decToBinaryInString(int n)
+  string decToBinaryInStringAndAddZero(int n)
   {
     // array to store binary number
     int binaryNum[32];
@@ -159,7 +194,7 @@ private:
     for (auto element : bucket)
     {
       // cout << "element " << element << endl;
-      string BucketIndexInBinary = decToBinaryInString(element);
+      string BucketIndexInBinary = decToBinaryInStringAndAddZero(element.getId());
       // cout << endl;
       if (BucketIndexInBinary == inputId)
       {
@@ -170,7 +205,7 @@ private:
       }
       else
       {
-         //========Not found ========
+        //========Not found ========
       }
     }
   }
@@ -204,7 +239,13 @@ private:
       // cout << "before n " << n << endl;
       n++;
       //  cout << "After n " << n << endl;
-      bucket.push_back(n - 1);
+
+      //====================================================ADD ID and OFFSET to bucket==============================================================================
+      int id = n;
+      int offset = n;
+      BucketIndex Btest(id, offset);
+      bucket.push_back(Btest);
+
       if (n > 2 ^ i)
       {
         //  cout << "before i " << i << endl;
@@ -245,7 +286,7 @@ private:
   {
     for (auto element : bucket)
     {
-      cout << element << endl;
+      cout << element.getId() << element.getOffset() << endl;
     }
   }
   // add bk index
@@ -253,7 +294,11 @@ private:
   {
     for (int x = 0; x < numberOfn; x++)
     {
-      bucket.push_back(x);
+      //====================================================ADD ID and OFFSET to bucket==============================================================================
+      int id = x;
+      int offset = x;
+      BucketIndex Btest(id, offset);
+      bucket.push_back(Btest);
       // string qwe = toBinary(x);
       // cout << "qwe.length()  " << qwe.length() << endl;
       // cout << "i  " << i << endl;
