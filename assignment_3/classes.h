@@ -51,11 +51,13 @@ public:
     cout << "\tMANAGER_ID: " << manager_id << "\n";
   }
 };
-class BucketIndex {
- public:
+class BucketIndex
+{
+public:
   int Id, Offset;
 
-  BucketIndex(int id, int offset) {
+  BucketIndex(int id, int offset)
+  {
     Id = id;
     Offset = offset;
   }
@@ -64,13 +66,15 @@ class BucketIndex {
   int getOffset() { return Offset; }
   int getId() { return Id; }
 
-  void print() {
+  void print()
+  {
     cout << "\tID: " << Id << "\n";
     cout << "\tOffset: " << Offset << "\n";
   }
 };
- 
-string toBinary(int n) {
+
+string toBinary(int n)
+{
   if (n == 0)
     return "0";
   else if (n == 1)
@@ -80,10 +84,11 @@ string toBinary(int n) {
   else if (n % 2 != 0)
     return toBinary(n / 2) + "1";
 }
- 
-class StorageBufferManager {
- private:
-  const int BLOCK_SIZE = 4096;  // initialize the  block size allowed in main
+
+class StorageBufferManager
+{
+private:
+  const int BLOCK_SIZE = 4096; // initialize the  block size allowed in main
   const int MAX_PAGE = 3;
   // You may declare variables based on your need
   int numRecords = 0;
@@ -222,8 +227,9 @@ class StorageBufferManager {
     initializeMemory();
   }
 
- public:
-  StorageBufferManager(string NewFileName) {
+public:
+  StorageBufferManager(string NewFileName)
+  {
     // initialize your variables
     fileName = NewFileName;
   }
@@ -250,7 +256,8 @@ class StorageBufferManager {
     file.read((char *)buffer, BLOCK_SIZE);
     int *freeBlock = (int *)(buffer + BLOCK_SIZE - intSize);
     int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
-    if (*itemCount == NULL || *itemCount == 0) {
+    if (*itemCount == NULL || *itemCount == 0)
+    {
       return false;
     }
     int currentPosition = 0;
@@ -291,7 +298,9 @@ class StorageBufferManager {
   {
     unsigned char *buffer =
         static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
+
     int offsetAt = 4096 * page;
+    cout << "asdasdasdasd" << endl;
     file.open(fileName, std::ios::binary | std::ios::in);
     file.seekg(offsetAt);
     file.read((char *)buffer, BLOCK_SIZE);
@@ -303,6 +312,7 @@ class StorageBufferManager {
     {
       sizeOfOffset += getSizeOfPage(page + 216);
     }
+
     return sizeOfOffset;
   }
 
@@ -321,7 +331,8 @@ class StorageBufferManager {
     int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
     int currentPosition = 0;
     // if new page
-    if (*itemCount == NULL || *itemCount == 0) {
+    if (*itemCount == NULL || *itemCount == 0)
+    {
       int *lastBlock = (int *)(buffer + BLOCK_SIZE - intSize);
       int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
       memcpy(buffer + currentPosition, item.serializeToString().data(),
@@ -362,7 +373,8 @@ class StorageBufferManager {
     writeFileAt(buffer, page);
   }
 
-  void removeRecordFromMemoryPage(int id, int page) {
+  void removeRecordFromMemoryPage(int id, int page)
+  {
     int isOverflow = page > 216 ? 1 : 0;
     unsigned char *buffer =
         static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
@@ -579,12 +591,7 @@ class StorageBufferManager {
   }
 };
 
-
-
-
- 
-
-StorageBufferManager manager ("EmployeeRelation");
+StorageBufferManager manager("EmployeeRelation");
 
 class LinearHashIndex
 {
@@ -592,6 +599,7 @@ private:
   const int BLOCK_SIZE = 4096;
   const int MAX_PAGE = 3;
   map<string, int> mp;
+  int overflowpage = 0;
   vector<BucketIndex>
       bucket;              // Map the least-significant-bits of h(id) to a bucket
                            // location in EmployeeIndex (e.g., the jth bucket) can
@@ -775,11 +783,28 @@ private:
         NewIdBinaryAfterMod.length() - i, NewIdBinaryAfterMod.length());
     cout << "Cut only = I " << ResultIndexAfterCut << endl;
 
-    //--------------------------------------
-    if (ni == 40) // <total_number_of_bytes_stored>
-                  // /(4KB*<number_of_non_overflow_pages>
+    //------------sum each pages--------------
+    int SumPageSize = 0;
+    int dfgdfg = manager.getSizeOfPage(bucket[1].getId()); // this line
+    cout << "dfgdfg " << dfgdfg << endl;
+    for (auto element : bucket)
     {
-       cout << "before n " << n << endl;
+      int eachPageSize = 0;
+
+       
+     
+      // SumPageSize = eachPageSize + manager.getSizeOfPage(element.getId()); // this line
+       
+
+      cout << "eachPageSize " << eachPageSize << endl;
+      // sum each page / 4096 * p
+    }
+    cout << "SumPageSize " << SumPageSize << endl;
+
+    if (SumPageSize / (4096 * (n + overflowpage))) // <total_number_of_bytes_stored>
+                                                   // /(4KB*<number_of_non_overflow_pages>
+    {
+      cout << "before n " << n << endl;
       n++;
       //  cout << "After n " << n << endl;
 
@@ -798,11 +823,11 @@ private:
       }
       printBucket();
     }
-    else // no need to extension   
+    else // no need to extension
     {
       if (checkBucketidMatchInputid(ResultIndexAfterCut))
       {
-        cout<<"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"<<endl;
+        cout << "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" << endl;
         // add in that Bucket
         int tttt = stoi(ResultIndexAfterCut);
         // cout << "Before tttttttttttttttt   " << tttt << endl;
