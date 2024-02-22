@@ -300,7 +300,7 @@ public:
         static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
 
     int offsetAt = 4096 * page;
-    cout << "asdasdasdasd" << endl;
+    // cout << "asdasdasdasd" << endl;
     file.open(fileName, std::ios::binary | std::ios::in);
     file.seekg(offsetAt);
     file.read((char *)buffer, BLOCK_SIZE);
@@ -785,19 +785,14 @@ private:
 
     //------------sum each pages--------------
     int SumPageSize = 0;
-    int dfgdfg = manager.getSizeOfPage(bucket[1].getId()); // this line
+    int dfgdfg = manager.getSizeOfPage(bucket[0].getId()); // this line
     cout << "dfgdfg " << dfgdfg << endl;
     for (auto element : bucket)
     {
-      int eachPageSize = 0;
 
-       
-     
-      // SumPageSize = eachPageSize + manager.getSizeOfPage(element.getId()); // this line
-       
+      SumPageSize = SumPageSize + manager.getSizeOfPage(element.getId()); // this line
 
-      cout << "eachPageSize " << eachPageSize << endl;
-      // sum each page / 4096 * p
+            // sum each page / 4096 * p
     }
     cout << "SumPageSize " << SumPageSize << endl;
 
