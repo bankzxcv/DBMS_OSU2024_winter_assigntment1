@@ -276,7 +276,8 @@ private:
       int offset = n;
       BucketIndex Btest(id, offset);
       bucket.push_back(Btest);
-
+      //chcek bitfilp of i page and update to correctly
+      
       if (n > 2 ^ i)
       {
         //  cout << "before i " << i << endl;
