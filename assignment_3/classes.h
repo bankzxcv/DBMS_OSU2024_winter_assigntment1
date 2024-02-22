@@ -186,6 +186,25 @@ private:
 
     return ans;
   }
+  string doBitfilp(string inputId)
+  {
+
+    string ans = inputId;
+    //cout << "!ans[] =  " << (!ans.at(0)) << endl;
+
+    //cout << "befor filp  " << ans << endl;
+    if ((ans.at(0)) == 0)
+    {
+      ans[0] = '1';
+    }
+    else
+    {
+      ans[0] = '0';
+    }
+
+    //cout << "after filp  " << ans << endl;
+    return ans;
+  }
   int ni = 0;
   // Insert new record into index
   void checkBucketidMatchInputid(string inputId)
@@ -200,6 +219,14 @@ private:
       if (BucketIndexInBinary == inputId)
       {
         cout << "-----------------------------------------------------------" << endl;
+        cout << endl
+             << "I Found it \n inputId :" << inputId << " macth with :" << BucketIndexInBinary << endl;
+        cout << "-----------------------------------------------------------" << endl;
+      }
+      else if (doBitfilp(inputId) == BucketIndexInBinary) // doBitfilp
+      {
+        //======== doBitfilp ========
+        cout << "------------------doBitfilp-----------------" << endl;
         cout << endl
              << "I Found it \n inputId :" << inputId << " macth with :" << BucketIndexInBinary << endl;
         cout << "-----------------------------------------------------------" << endl;
@@ -297,7 +324,7 @@ private:
     {
       //====================================================ADD ID and OFFSET to bucket==============================================================================
       int id = x;
-      int offset = x;
+      int offset = (x)*BLOCK_SIZE;
       BucketIndex Btest(id, offset);
       bucket.push_back(Btest);
       // string qwe = toBinary(x);
