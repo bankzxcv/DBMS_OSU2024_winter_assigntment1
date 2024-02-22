@@ -1104,7 +1104,7 @@ private:
     if (ni == 40) // <total_number_of_bytes_stored>
                   // /(4KB*<number_of_non_overflow_pages>
     {
-      // cout << "before n " << n << endl;
+       cout << "before n " << n << endl;
       n++;
       //  cout << "After n " << n << endl;
 
@@ -1123,11 +1123,11 @@ private:
       }
       printBucket();
     }
-    else // no need to extension
+    else // no need to extension   
     {
       if (checkBucketidMatchInputid(ResultIndexAfterCut))
       {
-
+        cout<<"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"<<endl;
         // add in that Bucket
         int tttt = stoi(ResultIndexAfterCut);
         // cout << "Before tttttttttttttttt   " << tttt << endl;
@@ -1139,7 +1139,7 @@ private:
       }
       else
       {
-        // dobitfilp
+        // dobitfilpppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
         string bitfilpIdCheck = doBitfilp(ResultIndexAfterCut);
         if (checkBucketidMatchInputid(bitfilpIdCheck))
         {
