@@ -16,9 +16,10 @@ using namespace std;
 
 class BucketIndex
 {
-public:
+private:
   int Id, Offset;
 
+public:
   BucketIndex(int id, int offset)
   {
     Id = id;
