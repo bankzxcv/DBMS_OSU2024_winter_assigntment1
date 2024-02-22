@@ -792,7 +792,7 @@ private:
 
       SumPageSize = SumPageSize + manager.getSizeOfPage(element.getId()); // this line
 
-            // sum each page / 4096 * p
+      // sum each page / 4096 * p
     }
     cout << "SumPageSize " << SumPageSize << endl;
 
