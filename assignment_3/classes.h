@@ -182,22 +182,23 @@ class LinearHashIndex {
         cout << "-----------------------------------------------------------"
              << endl;
         cout << endl
-             << "I Found it \n inputId :" << inputId << " macth with :" << BucketIndexInBinary << endl;
-        cout << "-----------------------------------------------------------" << endl;
-         //add record to that page
-      }
-      else if (doBitfilp(inputId) == BucketIndexInBinary) // doBitfilp
+             << "I Found it \n inputId :" << inputId
+             << " macth with :" << BucketIndexInBinary << endl;
+        cout << "-----------------------------------------------------------"
+             << endl;
+        // add record to that page
+      } else if (doBitfilp(inputId) == BucketIndexInBinary)  // doBitfilp
       {
         //======== doBitfilp ========
         cout << "------------------doBitfilp-----------------" << endl;
         cout << endl
-             << "I Found it \n inputId :" << inputId << " macth with :" << BucketIndexInBinary << endl;
-        cout << "-----------------------------------------------------------" << endl;
+             << "I Found it \n inputId :" << inputId
+             << " macth with :" << BucketIndexInBinary << endl;
+        cout << "-----------------------------------------------------------"
+             << endl;
 
-        //add record to that page
-      }
-      else
-      {
+        // add record to that page
+      } else {
         //========Not found ========
       }
     }
@@ -238,10 +239,9 @@ class LinearHashIndex {
       int offset = n;
       BucketIndex Btest(id, offset);
       bucket.push_back(Btest);
-      //chcek bitfilp of i page and update to correctly
-      
-      if (n > 2 ^ i)
-      {
+      // chcek bitfilp of i page and update to correctly
+
+      if (n > 2 ^ i) {
         //  cout << "before i " << i << endl;
         i++;
         //  cout << "After i " << i << endl;
@@ -614,7 +614,22 @@ class StorageBufferManager {
     writeFileAt(buffer, page);
   }
 
-  void removeRecordFromMemoryPage(int id, int page) {
+  int hasValueInPage(int page) {
+    unsigned char *buffer =
+        static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
+    int offsetAt = 4096 * page;
+    file.open(fileName, std::ios::binary | std::ios::in);
+    file.seekg(offsetAt);
+    file.read((char *)buffer, BLOCK_SIZE);
+    file.close();
+    int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
+    if (*itemCount == 0) {
+      return 0;
+    }
+    return 1;
+  }
+
+  int removeRecordFromMemoryPage(int id, int page) {
     int isOverflow = page > 216 ? 1 : 0;
     unsigned char *buffer =
         static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
@@ -624,6 +639,7 @@ class StorageBufferManager {
     file.read((char *)buffer, BLOCK_SIZE);
     file.close();
     int *freeBlock = (int *)(buffer + BLOCK_SIZE - intSize);
+    int *isPageOverFlow = (int *)(buffer + BLOCK_SIZE - intSize * 2);
     int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
     cout << "Free Block: " << *freeBlock << endl;
     cout << "Item Count: " << *itemCount << endl;
@@ -662,7 +678,16 @@ class StorageBufferManager {
       }
       currentPosition += *recordLen;
     }
+    // check if it has overflow page go to find and remove value in overflow
+    if (*isPageOverFlow != -1) {
+      int isRemove = removeRecordFromMemoryPage(id, page + 216);
+    }
+
     writeFileAt(buffer, page);
+
+    if (*itemCount == 0) {
+      return 1;
+    }
   }
 
   void readAtMemoryIndex() {
