@@ -14,11 +14,13 @@
 using namespace std;
 #define MAX 216
 
-class BucketIndex {
- public:
+class BucketIndex
+{
+public:
   int Id, Offset;
 
-  BucketIndex(int id, int offset) {
+  BucketIndex(int id, int offset)
+  {
     Id = id;
     Offset = offset;
   }
