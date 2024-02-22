@@ -388,6 +388,12 @@ class StorageBufferManager {
   int currentPage = 0;  // page 0, 1, 2 due to 3 pages possible
   int currentLength = 0;
 
+ public:
+  StorageBufferManager(string NewFileName) {
+    // initialize your variables
+    fileName = NewFileName;
+  }
+
   // Insert new record
   void setNextPage() {
     currentPage++;
@@ -484,12 +490,6 @@ class StorageBufferManager {
     initializeMemory();
   }
 
- public:
-  StorageBufferManager(string NewFileName) {
-    // initialize your variables
-    fileName = NewFileName;
-  }
-
   // loop print value in pageBuffer[2]
 
   void writeFileAt(unsigned char *buffer, int page) {
@@ -510,7 +510,7 @@ class StorageBufferManager {
     file.read((char *)buffer, BLOCK_SIZE);
     int *freeBlock = (int *)(buffer + BLOCK_SIZE - intSize);
     int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
-    if (*itemCount == NULL || *itemCount == 0) {
+    if (*itemCount == 0) {
       return false;
     }
     int currentPosition = 0;
@@ -574,7 +574,7 @@ class StorageBufferManager {
     int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
     int currentPosition = 0;
     // if new page
-    if (*itemCount == NULL || *itemCount == 0) {
+    if (*itemCount == 0) {
       int *lastBlock = (int *)(buffer + BLOCK_SIZE - intSize);
       int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
       memcpy(buffer + currentPosition, item.serializeToString().data(),
