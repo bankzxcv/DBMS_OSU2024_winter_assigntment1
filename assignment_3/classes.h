@@ -817,18 +817,13 @@ private:
       else
       {
         //========Not found ========
-        
       }
     }
     return false;
   }
 
-  void insertRecord(Record record)
+  string HashID(Record record)
   {
-    //-------------------------------------- mod , cut string
-    ni++;
-    printf("insert_Each_data (%d)\n", ni);
-    std::vector<char> r = record.serializeToString();
     convertToBinary(record.id);
     cout << "IdBinary " << IdBinary << endl;
     string NewIdBinaryAfterMod = "";
@@ -846,6 +841,33 @@ private:
     string ResultIndexAfterCut = NewIdBinaryAfterMod.substr(
         NewIdBinaryAfterMod.length() - i, NewIdBinaryAfterMod.length());
     cout << "Cut only = I " << ResultIndexAfterCut << endl;
+    return ResultIndexAfterCut;
+  }
+  void insertRecord(Record record)
+  {
+    //-------------------------------------- mod , cut string
+    ni++;
+    printf("insert_Each_data (%d)\n", ni);
+    std::vector<char> r = record.serializeToString();
+    // convertToBinary(record.id);
+    // cout << "IdBinary " << IdBinary << endl;
+    // string NewIdBinaryAfterMod = "";
+    // for (int j = 0; j < IdBinary.length(); j++)
+    // {
+    //   if (IdBinary.length() - j < 9)
+    //   {
+    //     NewIdBinaryAfterMod = NewIdBinaryAfterMod + IdBinary[j];
+    //   }
+    // }
+    // cout << "NewIdBinaryAfterMod :" << NewIdBinaryAfterMod << endl;
+
+    // IdBinary = "";
+
+    // string ResultIndexAfterCut = NewIdBinaryAfterMod.substr(
+    //     NewIdBinaryAfterMod.length() - i, NewIdBinaryAfterMod.length());
+    // cout << "Cut only = I " << ResultIndexAfterCut << endl;
+
+    string ResultIndexAfterCut = HashID(record);
     // numRecords /(4096 * (n + overflowpage))
     if (ni == 40 || ni == 45) // <total_number_of_bytes_stored>
                               // /(4KB*<number_of_non_overflow_pages>
@@ -873,14 +895,27 @@ private:
 
         //  cout << "After i " << i << endl;
         // need to rerange data in page
-        cout << "doBitfilp(decToBinaryInStringAndAddZero(id)) " << doBitfilp(decToBinaryInStringAndAddZero(id)) << endl;
+        // cout << "doBitfilp(decToBinaryInStringAndAddZero(id)) " << doBitfilp(decToBinaryInStringAndAddZero(id)) << endl;
 
         for (auto element : bucket)
         {
+          // Do bitfilp and check where is in BKArray
           if (doBitfilp(decToBinaryInStringAndAddZero(id)) == decToBinaryInStringAndAddZero(element.getId()))
           {
 
             cout << "Match ID  doBitfilp(decToBinaryInStringAndAddZero(id)) == decToBinaryInStringAndAddZero(element.getId()) " << doBitfilp(decToBinaryInStringAndAddZero(id)) << endl;
+            // load record that (element.id) and check all record that have (id) ver nonfilp and take that record to (id) page
+            // vector<Record> vi = getAllRecordIds(element.getId());
+            // for (const Record &ri : vi)
+            // {
+            //   cout << "Record = " << ri.id() << endl;
+            //   string as = HashID(ri);
+            //   if (as == decToBinaryInStringAndAddZero(element.getId()))
+            //   {
+            //     manager.insertToMemoryPage(ri, element.getId());
+            //     manager.removeRecordFromMemoryPage(ri.id, element.getId());
+            //   }
+            // }
           }
         }
       }
@@ -888,6 +923,7 @@ private:
     }
     else // no need to extension
     {
+      printBucket();
       if (checkBucketidMatchInputid(ResultIndexAfterCut))
       {
         cout << "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" << endl;
@@ -912,22 +948,12 @@ private:
           int tttt = stoi(bitfilpIdCheck);
           tttt = binaryToDecimal(tttt);
           manager.insertToMemoryPage(record, tttt);
+          cout << "--------------------------------------------------------------"
+                  "-------   "
+               << endl;
         }
       }
     }
-
-    NewIdBinaryAfterMod = "";
-    //----------------------------------------------------------------------
-    // Check ID match with BucketID
-
-    //----------------------------------------------------------------------
-
-    // record.print();
-    //  r to binary
-    //  rBianry = after to binary
-
-    // -----------------------------------------chcek bitfilp of i page and
-    // update to correctly
 
     // No records written to index yet
     if (numRecords == 0)
@@ -1034,6 +1060,8 @@ public:
 
       insertRecord(record);
     }
+
+    // printBucket();
     file.close();
     // Close the file
     csvFile.close();
