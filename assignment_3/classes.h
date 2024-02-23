@@ -372,7 +372,8 @@ public:
     int *isPageOverFlow = (int *)(buffer + BLOCK_SIZE - intSize * 2);
     cout << "isPageOverFlow " << *isPageOverFlow << "*ITEM COunt" << *itemCount
          << endl;
-    if (*isPageOverFlow > 0) {
+    if (*isPageOverFlow > 0)
+    {
       sizeOfOffset += getSizeOfPage(page + 216);
     }
 
@@ -889,8 +890,13 @@ private:
 
     string ResultIndexAfterCut = HashID(record);
     // numRecords /(4096 * (n + overflowpage))
-    if (ni == 40 || ni == 45) // <total_number_of_bytes_stored>
-                              // /(4KB*<number_of_non_overflow_pages>
+    numRecords = getSumSize();
+    cout << "numRecords " << numRecords << endl;
+    cout << "   4096 * (n) " << 4096 * (n) << endl;
+
+    cout << "numRecords / (4096 * (n)) " << (float)numRecords / (4096 * (n)) << endl;
+    if (numRecords / (4096 * (n)) > 0.7) // <total_number_of_bytes_stored>
+                                         // /(4KB*<number_of_non_overflow_pages>
     {
       // cout << "before n " << n << endl;
       n++;
@@ -925,9 +931,16 @@ private:
 
             cout << "Match ID  doBitfilp(decToBinaryInStringAndAddZero(id)) == decToBinaryInStringAndAddZero(element.getId()) " << doBitfilp(decToBinaryInStringAndAddZero(id)) << endl;
             // load record that (element.id) and check all record that have (id) ver nonfilp and take that record to (id) page
-                          cout << "getAllRecordIds------------------------------------------------------------------" << endl;
+            cout << "getAllRecordIds------------------------------------------------------------------" << endl;
 
             vector<Record> vi = manager.getAllRecordIds(element.getId());
+
+            // vector<Record> records = manager.getAllRecordIds(0);
+            // for (int i = 0; i < records.size(); i++)
+            // {
+            //   cout << records[i].id << endl;
+            // }
+
             for (auto ri : vi)
             {
               cout << "Remove------------------------------------------------------------------" << endl;
@@ -955,7 +968,7 @@ private:
 
         tttt = binaryToDecimal(tttt);
         // cout << "AFter tttttttttttttttt   " << tttt << endl;
-        // manager.insertToMemoryPage(record, tttt);
+        manager.insertToMemoryPage(record, tttt);
         cout << "--------------------------------------------------------------"
                 "-------   "
              << endl;
@@ -1075,18 +1088,6 @@ public:
 
       // //------------sum each pages--------------
 
-      // int dfgdfg = manager.getSizeOfPage(bucket[0].getId()); // this line
-      // cout << "dfgdfg " << dfgdfg << endl;
-      // for (auto element : bucket)
-      // {
-
-      //   // numRecords = numRecords + manager.getSizeOfPage(element.getId());
-      //   // this line
-
-      //   // sum each page / 4096 * p
-      // }
-      // cout << "numRecords " << numRecords << endl;
-
       insertRecord(record);
     }
 
@@ -1096,6 +1097,22 @@ public:
     file.close();
     // Close the file
     csvFile.close();
+  }
+  int getSumSize()
+  {
+
+    int sum = 0;
+    for (auto element : bucket)
+    {
+      cout << "element.getId().    " << element.getId() << endl;
+      sum = sum + manager.getSizeOfPage(element.getId());
+      cout << "manager.getSizeOfPage(element.getId())------------------------------------------------ " << manager.getSizeOfPage(element.getId()) << endl;
+      //  this line
+
+      // sum each page / 4096 * p
+    }
+    cout << "sum " << sum << endl;
+    return sum;
   }
   void writeToFile()
   {
