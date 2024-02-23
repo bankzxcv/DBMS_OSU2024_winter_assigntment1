@@ -591,12 +591,12 @@ public:
     readFromFile(id);
   }
 };
-
 StorageBufferManager manager("EmployeeRelation");
-
 class LinearHashIndex
 {
 private:
+  // StorageBufferManager manager;
+
   const int BLOCK_SIZE = 4096;
   const int MAX_PAGE = 3;
   map<string, int> mp;
@@ -781,7 +781,7 @@ private:
     }
     return false;
   }
-
+  int testtttt = 0;
   string HashID(Record record)
   {
     convertToBinary(record.id);
@@ -805,6 +805,10 @@ private:
   }
   void insertRecord(Record record)
   {
+    if (testtttt == 5)
+    {
+      return ;
+    }
     //-------------------------------------- mod , cut string
     ni++;
     printf("insert_Each_data (%d)\n", ni);
@@ -922,6 +926,8 @@ private:
     else
     {
     }
+
+    testtttt++;
   }
 
   void printBucket()
@@ -960,8 +966,12 @@ private:
   }
 
 public:
+  // LinearHashIndex(string indexFileName, StorageBufferManager managers)
   LinearHashIndex(string indexFileName)
+
   {
+    // manager = &managers;
+
     // info = (struct StorageBufferManager *)malloc(sizeof(struct
     // StorageBufferManager));
     n = 4; // Start with 4 buckets in index
