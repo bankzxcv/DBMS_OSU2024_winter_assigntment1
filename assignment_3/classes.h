@@ -414,38 +414,50 @@ class StorageBufferManager {
   }
 
   void removeRecordFromMemoryPage(int id, int page) {
+    int num = 0;
+    cout << num++ << "====================" << endl;
     unsigned char *buffer =
         static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
     int offsetAt = 4096 * page;
+    cout << num++ << "====================" << endl;
     file.open(fileName, std::ios::binary | std::ios::in);
     file.seekg(offsetAt);
     file.read((char *)buffer, BLOCK_SIZE);
     file.close();
+    cout << num++ << "====================" << endl;
     int *freeBlock = (int *)(buffer + BLOCK_SIZE - intSize);
     int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
     int currentPosition = 0;
     int *isOverflow = (int *)(buffer + BLOCK_SIZE - intSize * 2);
+    cout << num++ << "====================" << endl;
     if (*itemCount == 0 && *isOverflow <= 0) {
+      cout << num++ << "====================RETURN1" << endl;
       return;
     }
     if (*itemCount == 0 && *isOverflow > 0) {
+      cout << num++ << "====================GO OVERFLOW" << endl;
       removeRecordFromMemoryPage(id, page + 216);
       return;
     }
     for (int i = 0; i < *itemCount; i++) {
+      cout << num++ << "====================" << endl;
       int *recordLen = (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * i);
       char *record = (char *)malloc(*recordLen);
       memcpy(record, buffer + currentPosition, *recordLen);
+      cout << num++ << "====================" << endl;
       vector<string> fields;
       string str = string(record);
+      cout << num++ << "==================== STR = : " << str << endl;
       stringstream ss(str);
       string field;
       while (std::getline(ss, field, '$')) {
         fields.push_back(field);
       }
+      cout << num++ << "====================PUSH" << endl;
       // cout << "ID: " << fields[0] << " Target = " << id << " i=" << i <<
       // endl;
       free(record);
+      cout << num++ << "====================PUSH" << endl;
       cout << "string to int" << stoi(fields[0]) << " " << id << endl;
       if (stoi(fields[0]) == id) {
         int shift = currentPosition + *recordLen;
