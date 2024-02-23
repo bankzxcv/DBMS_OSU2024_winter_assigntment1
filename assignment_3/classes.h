@@ -890,6 +890,9 @@ class LinearHashIndex {
                      << endl;
                 manager.insertToMemoryPage(ri, id);
 
+                cout << "RIGHT HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEe   ID = "
+                     << ri.id << endl;
+
                 manager.removeRecordFromMemoryPage(ri.id, element.getId());
               }
             }
