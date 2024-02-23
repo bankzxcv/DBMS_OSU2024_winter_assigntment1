@@ -953,7 +953,7 @@ public:
       for (auto element : bucket)
       {
 
-        numRecords = numRecords + manager.getSizeOfPage(element.getId()); // this line
+        //numRecords = numRecords + manager.getSizeOfPage(element.getId()); // this line
 
         // sum each page / 4096 * p
       }
