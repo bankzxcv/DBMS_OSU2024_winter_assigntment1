@@ -336,7 +336,7 @@ class StorageBufferManager {
     int *isPageOverFlow = (int *)(buffer + BLOCK_SIZE - intSize * 2);
     cout << "isPageOverFlow " << *isPageOverFlow << "*ITEM COunt" << *itemCount
          << endl;
-    if (*isPageOverFlow != -1) {
+    if (*isPageOverFlow > 0) {
       sizeOfOffset += getSizeOfPage(page + 216);
     }
 
