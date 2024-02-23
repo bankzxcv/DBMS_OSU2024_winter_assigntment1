@@ -27,7 +27,6 @@ class Record {
   }
 
   std::vector<char> serializeToString() {
-    cout << "name: " << name << endl;
     string serialStr = to_string(id) + "$" + name + "$" + bio + "$" +
                        to_string(manager_id) + "$";
     vector<char> serial = {};
@@ -209,6 +208,17 @@ class StorageBufferManager {
   StorageBufferManager(string NewFileName) {
     // initialize your variables
     fileName = NewFileName;
+    // initializeFile(); if there is no data in the file
+    fstream file;
+    file.open(fileName, std::ios::in);
+    if (file.fail()) {
+      // deserve
+      const std::size_t size = 216 * 4096 * 20;
+      file.open(fileName, std::ios::out);
+      std::vector<char> buffer(size, '\0');
+      file.write(buffer.data(), buffer.size());
+      file.close();
+    }
   }
 
   // loop print value in pageBuffer[2]
@@ -288,6 +298,7 @@ class StorageBufferManager {
   }
 
   void insertToMemoryPage(Record item, int page) {
+    cout << "insert page" << endl;
     vector<char> r = item.serializeToString();
     unsigned char *buffer =
         static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
@@ -299,16 +310,34 @@ class StorageBufferManager {
     int *lastBlock = (int *)(buffer + BLOCK_SIZE - intSize);
     int *isOverflow = (int *)(buffer + BLOCK_SIZE - intSize * 2);
     int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
-    int currentPosition = 0;
+    int currentPosition = *lastBlock;
+    // print all above value
+    // if (page > 0) {
+    //   cout << "---- Last Block: " << *lastBlock << endl;
+    //   cout << "Is Overflow: " << *isOverflow << endl;
+    //   cout << "Item Count: " << *itemCount << endl;
+    // }
+
+    // return;
     // if new page
-    if (*itemCount == NULL || *itemCount == 0) {
+    if (*itemCount == 0) {
+      cout << "new page" << endl;
       int *lastBlock = (int *)(buffer + BLOCK_SIZE - intSize);
       int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
       memcpy(buffer + currentPosition, item.serializeToString().data(),
              item.serializeToString().size());
       *lastBlock = item.serializeToString().size();
       *itemCount = 1;
+      int recordLen = item.serializeToString().size();
+      memcpy(buffer + BLOCK_SIZE - intSize * 4, &recordLen, intSize);
+      cout << "write file at " << page << endl;
+      writeFileAt(buffer, page);
+      free(buffer);
     } else {
+      cout << "--- existed page ---" << endl;
+      cout << "Last Block: " << *lastBlock << endl;
+      cout << "Is Overflow: " << *isOverflow << endl;
+      cout << "Item Count: " << *itemCount << endl;
       for (int i = 0; i < *itemCount; i++) {
         int *recordLen =
             (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * i);
@@ -316,25 +345,33 @@ class StorageBufferManager {
       }
       // if overflow
       int sizeOfOffset = intSize * 3 + intSize * (*itemCount);
-      if (currentPosition + item.serializeToString().size() + sizeOfOffset >
-          BLOCK_SIZE) {
+      int currentSize =
+          currentPosition + item.serializeToString().size() + sizeOfOffset;
+      bool isPageOverFlow = currentSize > BLOCK_SIZE;
+
+      cout << "currentSize " << currentSize << endl;
+      if (isPageOverFlow) {
         *isOverflow = 1;
+        cout << "***DO overflow***" << endl;
         int *nextPage = (int *)(buffer + BLOCK_SIZE - intSize * 2);
-        if (*nextPage == -1) {
+        if (*nextPage <= 0) {
           *nextPage = page + 216;
         }
+        // cout this
         writeFileAt(buffer, page);
         free(buffer);
         insertToMemoryPage(item, page + 216);
-        return;
+      } else {
+        memcpy(buffer + currentPosition, item.serializeToString().data(),
+               item.serializeToString().size());
+        *lastBlock = *lastBlock + item.serializeToString().size();
+        *itemCount = *itemCount + 1;
+        cout << "write file at " << page << endl;
+        writeFileAt(buffer, page);
+        free(buffer);
       }
-
-      memcpy(buffer + currentPosition, item.serializeToString().data(),
-             item.serializeToString().size());
-      *lastBlock += item.serializeToString().size();
-      *itemCount += 1;
     }
-    writeFileAt(buffer, page);
+    ///
   }
 
   void removeRecordFromMemoryPage(int id, int page) {
@@ -348,8 +385,6 @@ class StorageBufferManager {
     file.close();
     int *freeBlock = (int *)(buffer + BLOCK_SIZE - intSize);
     int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
-    cout << "Free Block: " << *freeBlock << endl;
-    cout << "Item Count: " << *itemCount << endl;
     int currentPosition = 0;
     for (int i = 0; i < *itemCount; i++) {
       int *recordLen = (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * i);
@@ -705,14 +740,13 @@ class LinearHashIndex {
 
     //------------sum each pages--------------
     int SumPageSize = 0;
-    int dfgdfg = manager.getSizeOfPage(bucket[0].getId()); // this line
+    int dfgdfg = manager.getSizeOfPage(bucket[0].getId());  // this line
     cout << "dfgdfg " << dfgdfg << endl;
-    for (auto element : bucket)
-    {
+    for (auto element : bucket) {
+      SumPageSize =
+          SumPageSize + manager.getSizeOfPage(element.getId());  // this line
 
-      SumPageSize = SumPageSize + manager.getSizeOfPage(element.getId()); // this line
-
-            // sum each page / 4096 * p
+      // sum each page / 4096 * p
     }
     cout << "SumPageSize " << SumPageSize << endl;
 
