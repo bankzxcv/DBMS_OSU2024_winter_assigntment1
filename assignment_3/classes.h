@@ -397,32 +397,32 @@ class StorageBufferManager {
       bool isPageOverFlow = currentSize > BLOCK_SIZE;
       cout << "iiii2222222222" << i++ << endl;
       if (isPageOverFlow) {
-        cout << "iiii2222222222" << i++ << endl;
+        cout << "iiii2222222222333333333" << i++ << endl;
         *isOverflow = 1;
         int *nextPage = (int *)(buffer + BLOCK_SIZE - intSize * 2);
         if (*nextPage <= 0) {
           *nextPage = page + 216;
         }
         // cout this
-        cout << "iiii2222222222" << i++ << endl;
+        cout << "iiii2222222222333333333" << i++ << endl;
         writeFileAt(buffer, page);
         free(buffer);
-        cout << "iiii2222222222" << i++ << endl;
+        cout << "iiii222222222233333333" << i++ << endl;
         insertToMemoryPage(item, page + 216);
       } else {
-        cout << "iiii2222222222" << i++ << endl;
+        cout << "iiii2222222222444444444444" << i++ << endl;
         int sizeChar = item.serializeToString().size();
         int *positionToSave =
             (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * (*itemCount));
-        cout << "iiii2222222222" << i++ << endl;
+        cout << "iiii22222222224444444444" << i++ << endl;
         memcpy(positionToSave, &sizeChar, intSize);
 
-        cout << "iiii2222222222" << i++ << endl;
+        cout << "iiii2222222222444444444444" << i++ << endl;
         memcpy(buffer + currentPosition, item.serializeToString().data(),
                item.serializeToString().size());
         *lastBlock = *lastBlock + item.serializeToString().size();
         *itemCount = *itemCount + 1;
-        cout << "iiii2222222222" << i++ << endl;
+        cout << "iiii222222222244444444444" << i++ << endl;
         writeFileAt(buffer, page);
         free(buffer);
       }
