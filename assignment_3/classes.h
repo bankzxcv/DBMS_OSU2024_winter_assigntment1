@@ -1044,7 +1044,7 @@ public:
     {
 
       // Write to the file
-      file << "BUCKET_ID " << element.getId() << ", OFFSET " << element.getOffset() * 4096 << endl;
+      file << "BUCKET_ID " << decToBinaryInStringAndAddZero(element.getId()) << ", OFFSET " << element.getOffset() * 4096 << endl;
     }
   }
 
