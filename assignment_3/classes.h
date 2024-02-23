@@ -789,12 +789,11 @@ private:
     string ResultIndexAfterCut = NewIdBinaryAfterMod.substr(
         NewIdBinaryAfterMod.length() - i, NewIdBinaryAfterMod.length());
     cout << "Cut only = I " << ResultIndexAfterCut << endl;
-
-    if (numRecords /
-        (4096 * (n + overflowpage))) // <total_number_of_bytes_stored>
-                                     // /(4KB*<number_of_non_overflow_pages>
+    // numRecords /(4096 * (n + overflowpage))
+    if (ni == 40 || ni == 45) // <total_number_of_bytes_stored>
+                              // /(4KB*<number_of_non_overflow_pages>
     {
-      cout << "before n " << n << endl;
+      // cout << "before n " << n << endl;
       n++;
       //  cout << "After n " << n << endl;
 
@@ -802,16 +801,31 @@ private:
       // bucket
       // ADD more
       // bucket==============================================================================
-      int id = n;
-      int offset = n;
+      int id = n-1;
+      int offset = n-1;
       BucketIndex Btest(id, offset);
       bucket.push_back(Btest);
+      cout << "n  = " << n << endl;
+      cout << "pow(2, i) = " << pow(2, i) << endl;
 
-      if (n > 2 ^ i)
+      if (n > (pow(2, i)))
       {
+        cout << "i++ " << endl;
         //  cout << "before i " << i << endl;
         i++;
+
         //  cout << "After i " << i << endl;
+        // need to rerange data in page
+        cout << "doBitfilp(decToBinaryInStringAndAddZero(id)) " << doBitfilp(decToBinaryInStringAndAddZero(id)) << endl;
+
+        for (auto element : bucket)
+        {
+          if (doBitfilp(decToBinaryInStringAndAddZero(id)) == decToBinaryInStringAndAddZero(element.getId()))
+          {
+
+            cout << "Match ID  doBitfilp(decToBinaryInStringAndAddZero(id)) == decToBinaryInStringAndAddZero(element.getId()) " << doBitfilp(decToBinaryInStringAndAddZero(id)) << endl;
+          }
+        }
       }
       printBucket();
     }
@@ -871,7 +885,8 @@ private:
   {
     for (auto element : bucket)
     {
-      cout << element.getId() << element.getOffset() << endl;
+      cout << "ID " << element.getId() << "  "
+           << "Offset " << element.getOffset() << endl;
     }
   }
   // add bk index
@@ -946,18 +961,19 @@ public:
       // Create a record from the fields
       Record record(fields);
       // Insert the record into the EmployeeRelation
-      //------------sum each pages--------------
 
-      int dfgdfg = manager.getSizeOfPage(bucket[0].getId()); // this line
-      cout << "dfgdfg " << dfgdfg << endl;
-      for (auto element : bucket)
-      {
+      // //------------sum each pages--------------
 
-        //numRecords = numRecords + manager.getSizeOfPage(element.getId()); // this line
+      // int dfgdfg = manager.getSizeOfPage(bucket[0].getId()); // this line
+      // cout << "dfgdfg " << dfgdfg << endl;
+      // for (auto element : bucket)
+      // {
 
-        // sum each page / 4096 * p
-      }
-      cout << "numRecords " << numRecords << endl;
+      //   // numRecords = numRecords + manager.getSizeOfPage(element.getId()); // this line
+
+      //   // sum each page / 4096 * p
+      // }
+      // cout << "numRecords " << numRecords << endl;
 
       insertRecord(record);
     }
