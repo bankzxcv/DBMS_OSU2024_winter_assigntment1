@@ -579,11 +579,12 @@ class StorageBufferManager {
     readFromFile(id);
   }
 };
+StorageBufferManager manager("EmployeeRelation");
+class LinearHashIndex
+{
+private:
+  // StorageBufferManager manager;
 
-// StorageBufferManager manager("EmployeeRelation");
-
-class LinearHashIndex {
- private:
   const int BLOCK_SIZE = 4096;
   const int MAX_PAGE = 3;
   map<string, int> mp;
@@ -749,12 +750,9 @@ class LinearHashIndex {
     }
     return false;
   }
-
-  void insertRecord(Record record) {
-    //-------------------------------------- mod , cut string
-    ni++;
-    printf("insert_Each_data (%d)\n", ni);
-    std::vector<char> r = record.serializeToString();
+  // int testtttt = 0;
+  string HashID(Record record)
+  {
     convertToBinary(record.id);
     cout << "IdBinary " << IdBinary << endl;
     string NewIdBinaryAfterMod = "";
@@ -770,6 +768,37 @@ class LinearHashIndex {
     string ResultIndexAfterCut = NewIdBinaryAfterMod.substr(
         NewIdBinaryAfterMod.length() - i, NewIdBinaryAfterMod.length());
     cout << "Cut only = I " << ResultIndexAfterCut << endl;
+    return ResultIndexAfterCut;
+  }
+  void insertRecord(Record record)
+  {
+    // if (testtttt == 5)
+    // {
+    //   return;
+    // }
+    //-------------------------------------- mod , cut string
+    ni++;
+    printf("insert_Each_data (%d)\n", ni);
+    std::vector<char> r = record.serializeToString();
+    // convertToBinary(record.id);
+    // cout << "IdBinary " << IdBinary << endl;
+    // string NewIdBinaryAfterMod = "";
+    // for (int j = 0; j < IdBinary.length(); j++)
+    // {
+    //   if (IdBinary.length() - j < 9)
+    //   {
+    //     NewIdBinaryAfterMod = NewIdBinaryAfterMod + IdBinary[j];
+    //   }
+    // }
+    // cout << "NewIdBinaryAfterMod :" << NewIdBinaryAfterMod << endl;
+
+    // IdBinary = "";
+
+    // string ResultIndexAfterCut = NewIdBinaryAfterMod.substr(
+    //     NewIdBinaryAfterMod.length() - i, NewIdBinaryAfterMod.length());
+    // cout << "Cut only = I " << ResultIndexAfterCut << endl;
+
+    string ResultIndexAfterCut = HashID(record);
     // numRecords /(4096 * (n + overflowpage))
     if (ni == 40 || ni == 45)  // <total_number_of_bytes_stored>
                                // /(4KB*<number_of_non_overflow_pages>
@@ -796,22 +825,36 @@ class LinearHashIndex {
 
         //  cout << "After i " << i << endl;
         // need to rerange data in page
-        cout << "doBitfilp(decToBinaryInStringAndAddZero(id)) "
-             << doBitfilp(decToBinaryInStringAndAddZero(id)) << endl;
+        // cout << "doBitfilp(decToBinaryInStringAndAddZero(id)) " << doBitfilp(decToBinaryInStringAndAddZero(id)) << endl;
 
-        for (auto element : bucket) {
-          if (doBitfilp(decToBinaryInStringAndAddZero(id)) ==
-              decToBinaryInStringAndAddZero(element.getId())) {
-            cout << "Match ID  doBitfilp(decToBinaryInStringAndAddZero(id)) == "
-                    "decToBinaryInStringAndAddZero(element.getId()) "
-                 << doBitfilp(decToBinaryInStringAndAddZero(id)) << endl;
+        for (auto element : bucket)
+        {
+          // Do bitfilp and check where is in BKArray
+          if (doBitfilp(decToBinaryInStringAndAddZero(id)) == decToBinaryInStringAndAddZero(element.getId()))
+          {
+
+            cout << "Match ID  doBitfilp(decToBinaryInStringAndAddZero(id)) == decToBinaryInStringAndAddZero(element.getId()) " << doBitfilp(decToBinaryInStringAndAddZero(id)) << endl;
+            // load record that (element.id) and check all record that have (id) ver nonfilp and take that record to (id) page
+            // vector<Record> vi = getAllRecordIds(element.getId());
+            // for (const Record &ri : vi)
+            // {
+            //   cout << "Record = " << ri.id() << endl;
+            //   string as = HashID(ri);
+            //   if (as == decToBinaryInStringAndAddZero(element.getId()))
+            //   {
+            //     manager.insertToMemoryPage(ri, element.getId());
+            //     manager.removeRecordFromMemoryPage(ri.id, element.getId());
+            //   }
+            // }
           }
         }
       }
       printBucket();
     } else  // no need to extension
     {
-      if (checkBucketidMatchInputid(ResultIndexAfterCut)) {
+      printBucket();
+      if (checkBucketidMatchInputid(ResultIndexAfterCut))
+      {
         cout << "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" << endl;
         // add in that Bucket
         int tttt = stoi(ResultIndexAfterCut);
@@ -830,31 +873,20 @@ class LinearHashIndex {
           // add in that Bucket
           int tttt = stoi(bitfilpIdCheck);
           tttt = binaryToDecimal(tttt);
-          // manager.insertToMemoryPage(record, tttt);
+          manager.insertToMemoryPage(record, tttt);
+          cout << "--------------------------------------------------------------"
+                  "-------   "
+               << endl;
         }
       }
     }
-
-    NewIdBinaryAfterMod = "";
-
-    cout << "Start HERE" << endl;
-    // manager.getAllRecordIds(0);
-    //----------------------------------------------------------------------
-    // Check ID match with BucketID
-
-    //----------------------------------------------------------------------
-
-    // record.print();
-    //  r to binary
-    //  rBianry = after to binary
-
-    // -----------------------------------------chcek bitfilp of i page and
-    // update to correctly
 
     // No records written to index yet
     if (numRecords == 0) {
     } else {
     }
+
+    // testtttt++;
   }
 
   void printBucket() {
@@ -888,8 +920,13 @@ class LinearHashIndex {
     printBucket();
   }
 
- public:
-  LinearHashIndex(string indexFileName) {
+public:
+  // LinearHashIndex(string indexFileName, StorageBufferManager managers)
+  LinearHashIndex(string indexFileName)
+
+  {
+    // manager = &managers;
+
     // info = (struct StorageBufferManager *)malloc(sizeof(struct
     // StorageBufferManager));
     n = 4;  // Start with 4 buckets in index
@@ -945,10 +982,24 @@ class LinearHashIndex {
 
       insertRecord(record);
     }
+
+    writeToFile();
+
+    // printBucket();
     file.close();
     // Close the file
     csvFile.close();
   }
+  void writeToFile()
+  {
+    for (auto element : bucket)
+    {
+
+      // Write to the file
+      file << "BUCKET_ID " << decToBinaryInStringAndAddZero(element.getId()) << ", OFFSET " << element.getOffset() * 4096 << endl;
+    }
+  }
+
   // Given an ID, find the relevant record and print it
   Record findRecordById(int index) {
     cout << "Finding record with id: " << index << endl;
