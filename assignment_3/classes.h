@@ -332,7 +332,7 @@ public:
 
   void insertToMemoryPage(Record item, int page)
   {
-    cout << "insert page" << endl;
+    cout << "insert data" << item.id << endl;
     vector<char> r = item.serializeToString();
     unsigned char *buffer =
         static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
@@ -345,18 +345,8 @@ public:
     int *isOverflow = (int *)(buffer + BLOCK_SIZE - intSize * 2);
     int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
     int currentPosition = *lastBlock;
-    // print all above value
-    // if (page > 0) {
-    //   cout << "---- Last Block: " << *lastBlock << endl;
-    //   cout << "Is Overflow: " << *isOverflow << endl;
-    //   cout << "Item Count: " << *itemCount << endl;
-    // }
-
-    // return;
-    // if new page
     if (*itemCount == 0)
     {
-      cout << "new page" << endl;
       int *lastBlock = (int *)(buffer + BLOCK_SIZE - intSize);
       int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
       memcpy(buffer + currentPosition, item.serializeToString().data(),
@@ -365,16 +355,11 @@ public:
       *itemCount = 1;
       int recordLen = item.serializeToString().size();
       memcpy(buffer + BLOCK_SIZE - intSize * 4, &recordLen, intSize);
-      cout << "write file at " << page << endl;
       writeFileAt(buffer, page);
       free(buffer);
     }
     else
     {
-      cout << "--- existed page ---" << endl;
-      cout << "Last Block: " << *lastBlock << endl;
-      cout << "Is Overflow: " << *isOverflow << endl;
-      cout << "Item Count: " << *itemCount << endl;
       for (int i = 0; i < *itemCount; i++)
       {
         int *recordLen =
@@ -386,12 +371,9 @@ public:
       int currentSize =
           currentPosition + item.serializeToString().size() + sizeOfOffset;
       bool isPageOverFlow = currentSize > BLOCK_SIZE;
-
-      cout << "currentSize " << currentSize << endl;
       if (isPageOverFlow)
       {
         *isOverflow = 1;
-        cout << "***DO overflow***" << endl;
         int *nextPage = (int *)(buffer + BLOCK_SIZE - intSize * 2);
         if (*nextPage <= 0)
         {
@@ -408,7 +390,6 @@ public:
                item.serializeToString().size());
         *lastBlock = *lastBlock + item.serializeToString().size();
         *itemCount = *itemCount + 1;
-        cout << "write file at " << page << endl;
         writeFileAt(buffer, page);
         free(buffer);
       }
@@ -432,7 +413,6 @@ public:
     for (int i = 0; i < *itemCount; i++)
     {
       int *recordLen = (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * i);
-      cout << "Record Length: " << *recordLen << endl;
       char *record = (char *)malloc(*recordLen);
       memcpy(record, buffer + currentPosition, *recordLen);
       vector<string> fields;
@@ -443,7 +423,7 @@ public:
       {
         fields.push_back(field);
       }
-      cout << "ID: " << fields[0] << " Target = " << id << " i=" << i << endl;
+      // cout << "ID: " << fields[0] << " Target = " << id << " i=" << i << endl;
       free(record);
       if (stoi(fields[0]) == id)
       {
@@ -468,26 +448,6 @@ public:
       currentPosition += *recordLen;
     }
     writeFileAt(buffer, page);
-  }
-
-  void readAtMemoryIndex()
-  {
-    removeRecordFromMemoryPage(11432120, 0);
-    return;
-
-    int page = 0;
-    int offsetAt = 4096 * page;
-
-    // declare local page buffer
-    unsigned char *pageBufferTmp =
-        static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
-
-    file.open(fileName, std::ios::binary | std::ios::in);
-    file.seekg(offsetAt);
-    file.read((char *)pageBufferTmp, BLOCK_SIZE);
-    file.close();
-    removeRecordFromMemoryPage(11432120, 0);
-    removeRecordFromMemoryPage(11432120, 0);
   }
 
   void writePageBufferToFile()
