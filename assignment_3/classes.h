@@ -366,19 +366,27 @@ class StorageBufferManager {
     int currentPosition = *lastBlock;
     cout << "currentPosition = " << currentPosition << endl;
     cout << "item count = " << *itemCount << endl;
+    int i = 0;
+    cout << "iiiiiiiiiiii" << i++ << endl;
     if (*itemCount == 0) {
+      cout << "iiiiiiiiiiii" << i++ << endl;
       int *lastBlock = (int *)(buffer + BLOCK_SIZE - intSize);
       int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
+      cout << "iiiiiiiiiiii" << i++ << endl;
       memcpy(buffer + currentPosition, item.serializeToString().data(),
              item.serializeToString().size());
+      cout << "iiiiiiiiiiii" << i++ << endl;
 
       // print the buffer + currentPosition with the size of the record
       *lastBlock = item.serializeToString().size();
       *itemCount = 1;
+      cout << "iiiiiiiiiiii" << i++ << endl;
       int recordLen = item.serializeToString().size();
       memcpy(buffer + BLOCK_SIZE - intSize * 4, &recordLen, intSize);
+      cout << "iiiiiiiiiiii" << i++ << endl;
       writeFileAt(buffer, page);
       free(buffer);
+      cout << "iiiiiiiiiiii" << i++ << endl;
     } else {
       int positionSave;
 
