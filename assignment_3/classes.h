@@ -841,6 +841,7 @@ private:
   // int testtttt = 0;
   string HashID(Record record)
   {
+    IdBinary = "";
     convertToBinary(record.id);
     cout << "IdBinary " << IdBinary << endl;
     string NewIdBinaryAfterMod = "";
@@ -945,9 +946,11 @@ private:
             {
               cout << "Remove------------------------------------------------------------------" << endl;
               string as = HashID(ri);
-              if (as == decToBinaryInStringAndAddZero(element.getId()))
+              if (as == decToBinaryInStringAndAddZero(id))
               {
-                manager.insertToMemoryPage(ri, element.getId());
+                cout << "Remove------------------------------------------------------------------" << endl;
+                manager.insertToMemoryPage(ri, id);
+
                 manager.removeRecordFromMemoryPage(ri.id, element.getId());
               }
             }
@@ -1127,7 +1130,7 @@ public:
   // Given an ID, find the relevant record and print it
   void findRecordById(int index)
   {
-
+    IdBinary = "";
     convertToBinary(index);
     cout << "IdBinary " << IdBinary << endl;
     string NewIdBinaryAfterMod = "";
@@ -1159,15 +1162,11 @@ public:
         for (auto ri : vi)
         {
 
-          string as = HashID(ri);
-
-          if (as == decToBinaryInStringAndAddZero(element.getId()))
+          if (index == ri.id)
           {
-            if (index == ri.id)
-            {
-              cout << "FOUND--------------------------------------------------------------------------------" << endl;
-              ri.print();
-            }
+            cout << "FOUND--------------------------------------------------------------------------------" << endl;
+            ri.print();
+            break;
           }
         }
       }
@@ -1180,18 +1179,16 @@ public:
           for (auto ri : vi)
           {
 
-            string as = HashID(ri);
-            if (as == decToBinaryInStringAndAddZero(element.getId()))
+            if (index == ri.id)
             {
-              if (index == ri.id)
-              {
-                cout << "FOUND--------------------------------------------------------------------------------" << endl;
-                ri.print();
-              }
+              cout << "FOUND--------------------------------------------------------------------------------" << endl;
+              ri.print();
+              break;
             }
           }
         }
       }
+      //cout << "NOTFOUND--------------------------------------------------------------------------------" << endl;
     }
 
     // get hash index table
