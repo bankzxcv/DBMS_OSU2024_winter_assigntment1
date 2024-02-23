@@ -459,23 +459,28 @@ class StorageBufferManager {
       free(record);
       cout << num++ << "====================PUSH" << endl;
       cout << "string to int" << stoi(fields[0]) << " " << id << endl;
-      if (stoi(fields[0]) == id) {
-        int shift = currentPosition + *recordLen;
-        int shiftLen = *freeBlock - shift;
-        memcpy(buffer + currentPosition, buffer + shift, shiftLen);
+      try {
+        /* code */
+        if (stoi(fields[0]) == id) {
+          int shift = currentPosition + *recordLen;
+          int shiftLen = *freeBlock - shift;
+          memcpy(buffer + currentPosition, buffer + shift, shiftLen);
 
-        *freeBlock -= *recordLen;
-        *itemCount -= 1;
-        for (int j = i; j < *itemCount; j++) {
-          int *recordLen =
-              (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * j);
-          int *recordLenNext =
-              (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * (j + 1));
-          memcpy(buffer + BLOCK_SIZE - intSize * 4 - intSize * j, recordLenNext,
-                 intSize);
+          *freeBlock -= *recordLen;
+          *itemCount -= 1;
+          for (int j = i; j < *itemCount; j++) {
+            int *recordLen =
+                (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * j);
+            int *recordLenNext =
+                (int *)(buffer + BLOCK_SIZE - intSize * 4 - intSize * (j + 1));
+            memcpy(buffer + BLOCK_SIZE - intSize * 4 - intSize * j,
+                   recordLenNext, intSize);
+          }
+          memcpy(buffer + BLOCK_SIZE - intSize, freeBlock, intSize);
+          break;
         }
-        memcpy(buffer + BLOCK_SIZE - intSize, freeBlock, intSize);
-        break;
+      } catch (const std::exception &e) {
+        std::cerr << e.what() << '\n';
       }
       currentPosition += *recordLen;
     }
