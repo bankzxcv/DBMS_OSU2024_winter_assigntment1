@@ -738,19 +738,7 @@ class LinearHashIndex {
         NewIdBinaryAfterMod.length() - i, NewIdBinaryAfterMod.length());
     cout << "Cut only = I " << ResultIndexAfterCut << endl;
 
-    //------------sum each pages--------------
-    int SumPageSize = 0;
-    int dfgdfg = manager.getSizeOfPage(bucket[0].getId());  // this line
-    cout << "dfgdfg " << dfgdfg << endl;
-    for (auto element : bucket) {
-      SumPageSize =
-          SumPageSize + manager.getSizeOfPage(element.getId());  // this line
-
-      // sum each page / 4096 * p
-    }
-    cout << "SumPageSize " << SumPageSize << endl;
-
-    if (SumPageSize /
+    if (numRecords /
         (4096 * (n + overflowpage)))  // <total_number_of_bytes_stored>
                                       // /(4KB*<number_of_non_overflow_pages>
     {
@@ -888,6 +876,18 @@ class LinearHashIndex {
       // Create a record from the fields
       Record record(fields);
       // Insert the record into the EmployeeRelation
+      //------------sum each pages--------------
+
+      int dfgdfg = manager.getSizeOfPage(bucket[0].getId());  // this line
+      cout << "dfgdfg " << dfgdfg << endl;
+      for (auto element : bucket) {
+        // numRecords = numRecords + manager.getSizeOfPage(element.getId()); //
+        // this line
+
+        // sum each page / 4096 * p
+      }
+      cout << "numRecords " << numRecords << endl;
+
       insertRecord(record);
     }
     file.close();
