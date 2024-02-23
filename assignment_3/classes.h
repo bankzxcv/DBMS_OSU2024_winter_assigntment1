@@ -1125,13 +1125,76 @@ public:
   }
 
   // Given an ID, find the relevant record and print it
-  Record findRecordById(int index)
+  void findRecordById(int index)
   {
+
+    convertToBinary(index);
+    cout << "IdBinary " << IdBinary << endl;
+    string NewIdBinaryAfterMod = "";
+    for (int j = 0; j < IdBinary.length(); j++)
+    {
+      if (IdBinary.length() - j < 9)
+      {
+        NewIdBinaryAfterMod = NewIdBinaryAfterMod + IdBinary[j];
+      }
+    }
+    cout << "NewIdBinaryAfterMod :" << NewIdBinaryAfterMod << endl;
+
+    IdBinary = "";
+
+    string ResultIndexAfterCut = NewIdBinaryAfterMod.substr(
+        NewIdBinaryAfterMod.length() - i, NewIdBinaryAfterMod.length());
+    cout << "Cut only = I " << ResultIndexAfterCut << endl;
+
     cout << "Finding record with id: " << index << endl;
     // load file
+    for (auto element : bucket)
+    {
+      // Do bitfilp and check where is in BKArray
+      if (ResultIndexAfterCut == decToBinaryInStringAndAddZero(element.getId()))
+      {
+
+        vector<Record> vi = manager.getAllRecordIds(element.getId());
+
+        for (auto ri : vi)
+        {
+
+          string as = HashID(ri);
+
+          if (as == decToBinaryInStringAndAddZero(element.getId()))
+          {
+            if (index == ri.id)
+            {
+              cout << "FOUND--------------------------------------------------------------------------------" << endl;
+              ri.print();
+            }
+          }
+        }
+      }
+      else
+      {
+        if (doBitfilp(ResultIndexAfterCut) == decToBinaryInStringAndAddZero(element.getId()))
+        {
+          vector<Record> vi = manager.getAllRecordIds(element.getId());
+
+          for (auto ri : vi)
+          {
+
+            string as = HashID(ri);
+            if (as == decToBinaryInStringAndAddZero(element.getId()))
+            {
+              if (index == ri.id)
+              {
+                cout << "FOUND--------------------------------------------------------------------------------" << endl;
+                ri.print();
+              }
+            }
+          }
+        }
+      }
+    }
+
     // get hash index table
     // find input in table
-
-    // return record;
   }
 };
