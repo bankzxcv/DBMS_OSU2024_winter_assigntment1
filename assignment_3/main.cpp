@@ -21,8 +21,8 @@ int main(int argc, char* const argv[]) {
   emp_index.createFromFile("Employee.csv");
 
   // Create the EmployeeRelation file from Employee.csv
-  StorageBufferManager manager("EmployeeRelation");
-  manager.createFromFile("Employee.csv");
+  // StorageBufferManager manager("EmployeeRelation");
+  // manager.createFromFile("Employee.csv");
 
   // Loop to lookup IDs until user is ready to quit
   // int id;
