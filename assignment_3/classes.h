@@ -781,7 +781,7 @@ private:
     }
     return false;
   }
-  int testtttt = 0;
+  // int testtttt = 0;
   string HashID(Record record)
   {
     convertToBinary(record.id);
@@ -805,10 +805,10 @@ private:
   }
   void insertRecord(Record record)
   {
-    if (testtttt == 5)
-    {
-      return ;
-    }
+    // if (testtttt == 5)
+    // {
+    //   return;
+    // }
     //-------------------------------------- mod , cut string
     ni++;
     printf("insert_Each_data (%d)\n", ni);
@@ -927,7 +927,7 @@ private:
     {
     }
 
-    testtttt++;
+    // testtttt++;
   }
 
   void printBucket()
@@ -1031,11 +1031,23 @@ public:
       insertRecord(record);
     }
 
+    writeToFile();
+
     // printBucket();
     file.close();
     // Close the file
     csvFile.close();
   }
+  void writeToFile()
+  {
+    for (auto element : bucket)
+    {
+
+      // Write to the file
+      file << "BUCKET_ID " << element.getId() << ", OFFSET " << element.getOffset() * 4096 << endl;
+    }
+  }
+
   // Given an ID, find the relevant record and print it
   Record findRecordById(int index)
   {
