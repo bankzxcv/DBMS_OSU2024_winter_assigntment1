@@ -414,7 +414,6 @@ class StorageBufferManager {
   }
 
   void removeRecordFromMemoryPage(int id, int page) {
-    int isOverflow = page > 216 ? 1 : 0;
     unsigned char *buffer =
         static_cast<unsigned char *>(std::malloc(BLOCK_SIZE));
     int offsetAt = 4096 * page;
@@ -425,10 +424,11 @@ class StorageBufferManager {
     int *freeBlock = (int *)(buffer + BLOCK_SIZE - intSize);
     int *itemCount = (int *)(buffer + BLOCK_SIZE - intSize * 3);
     int currentPosition = 0;
-    if (*itemCount == 0 && isOverflow <= 0) {
+    int *isOverflow = (int *)(buffer + BLOCK_SIZE - intSize * 2);
+    if (*itemCount == 0 && *isOverflow <= 0) {
       return;
     }
-    if (*itemCount == 0 && isOverflow > 0) {
+    if (*itemCount == 0 && *isOverflow > 0) {
       removeRecordFromMemoryPage(id, page + 216);
       return;
     }
