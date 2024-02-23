@@ -312,6 +312,7 @@ class StorageBufferManager {
       }
       cout << "ID: " << fields[0] << " Target = " << id << " i=" << i << endl;
       free(record);
+      cout << "string to int" << stoi(fields[0]) << " " << id << endl;
       if (stoi(fields[0]) == id) {
         return true;
       }
@@ -438,6 +439,7 @@ class StorageBufferManager {
       // cout << "ID: " << fields[0] << " Target = " << id << " i=" << i <<
       // endl;
       free(record);
+      cout << "string to int" << stoi(fields[0]) << " " << id << endl;
       if (stoi(fields[0]) == id) {
         int shift = currentPosition + *recordLen;
         int shiftLen = *freeBlock - shift;
@@ -884,6 +886,7 @@ class LinearHashIndex {
       if (checkBucketidMatchInputid(ResultIndexAfterCut)) {
         cout << "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" << endl;
         // add in that Bucket
+        cout << "string to int" << stoi(ResultIndexAfterCut) << " " << endl;
         int tttt = stoi(ResultIndexAfterCut);
         // cout << "Before tttttttttttttttt   " << tttt << endl;
 
