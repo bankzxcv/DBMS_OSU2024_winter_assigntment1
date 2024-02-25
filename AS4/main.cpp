@@ -92,7 +92,7 @@ int main()
     int set = 1;
     int test = 0;
     int count = 0;
-    // Records r = Grab_Emp_Record(empin);
+
     ofstream outfile("output.txt");
 
     // Check if the file is opened successfully
@@ -113,14 +113,13 @@ int main()
             if (count == 20)
             {
                 buffers[count] = r;
-                // set Zero
 
                 // do sort
                 //  Sort the elements using  sort
-                SortTest(buffers, buffer_size-1); // not mergesort yet
+                SortTest(buffers, buffer_size - 1); // not mergesort yet
 
                 // Output the sorted elements
-                // cout << "After sort => ";
+
                 int nub = 1;
                 for (int i = 0; i < buffer_size - 1; i++)
                 {
@@ -136,17 +135,14 @@ int main()
 
                 // Close the file after writing
 
-                cout << "count :" << count << endl
-                     << "set :" << set << endl; // Output the line to the console
+                cout << "count :" << count << endl;
+                cout << "set :" << set << endl; // Output the line to the console
 
-                cout << endl
-                     << endl;
+                cout << endl;
+
                 set++;
                 test++;
             }
-
-            // buffers[count].print();
-            // outfile << buffers[count].emp_record.ename << endl;
 
             count++;
             if (count > 20)
@@ -155,15 +151,6 @@ int main()
             }
         }
     }
-    // if (count != 0)
-    // {
-
-    //     for (size_t i = 0; i == count; i++)
-    //     {
-    //         buffers[i];
-    //     }
-    // }
-    cout << "test :" << test << endl; // Output the line to the console
 
     // Close the file after reading
     empin.close();
