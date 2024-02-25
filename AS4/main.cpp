@@ -110,26 +110,27 @@ int main()
         {
 
             buffers[count] = r;
-            if (count == buffer_size - 2)
+            if (count == 20)
             {
                 buffers[count] = r;
                 // set Zero
 
                 // do sort
                 //  Sort the elements using  sort
-                SortTest(buffers, buffer_size); // not mergesort yet
+                SortTest(buffers, buffer_size-1); // not mergesort yet
 
                 // Output the sorted elements
                 // cout << "After sort => ";
                 int nub = 1;
                 for (int i = 0; i < buffer_size - 1; i++)
                 {
+                    cout << buffers[i].emp_record.eid << endl;
+
                     ostringstream str1;
 
                     long salary = buffers[i].emp_record.salary;
                     // Write some data to the file
                     outfile << buffers[i].emp_record.eid << "," << buffers[i].emp_record.ename << "," << buffers[i].emp_record.age << "," << salary << endl;
-                    // cout << element.emp_record.eid << " nub :" << nub << endl;
                     nub++;
                 }
 
@@ -148,14 +149,10 @@ int main()
             // outfile << buffers[count].emp_record.ename << endl;
 
             count++;
-            if (count > buffer_size - 2)
+            if (count > 20)
             {
                 count = 0;
             }
-        }
-        else
-        {
-            cout << "--------------------------" << endl;
         }
     }
     // if (count != 0)
