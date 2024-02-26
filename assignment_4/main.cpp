@@ -102,9 +102,13 @@ void Merge_Runs() {
 
     cout << "outputBuffer value = " << buffers[0].emp_record.eid << endl;
     cout << "currentMPage = " << buffers[0].currentMPage << endl;
-    cout << "no_values = " << buffers[0].no_values << endl;
     if (buffers[0].no_values == -1) {
       cout << "no_values = -1" << endl;
+      // remove all run files
+      for(int i = 0; i < 22; i++) {
+        string filename = "run_" + to_string(i) + ".csv";
+        remove(filename.c_str());
+      }
       return;
     }
     // open file to write
