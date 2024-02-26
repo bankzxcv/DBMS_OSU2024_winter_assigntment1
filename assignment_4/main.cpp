@@ -17,6 +17,8 @@ Records buffers[buffer_size];  // use this class object of size 22 as your main
 // Sorting the buffers in main_memory and storing the sorted records into a
 // temporary file (Runs)
 void Sort_Buffer(Records buffers[], int i, int &runningNumber) {
+
+    cout<<"Sort_Buffer   "<< i <<endl;
   // Remember: You can use only [AT MOST] 22 blocks for sorting the records /
   // tuples and create the runs
   // create run_{runningNumber} file
@@ -33,13 +35,14 @@ void Sort_Buffer(Records buffers[], int i, int &runningNumber) {
     cerr << "Failed to open file runs.csv" << endl;
     return;
   }
-
+ 
   for (int j = 0; j < i; j++) {
     run << buffers[j].emp_record.eid << "," << buffers[j].emp_record.ename
         << "," << buffers[j].emp_record.age << ","
         << buffers[j].emp_record.salary << endl;
   }
   run.close();
+ 
 }
 
 // PASS 2
@@ -171,7 +174,9 @@ int main() {
   while (true) {
     Records r = Grab_Emp_Record(empin);
     if (r.no_values == -1) {
+      
       Sort_Buffer(buffers, i, runningNumber);
+      
       break;
     }
     // push r to buffers
@@ -180,7 +185,7 @@ int main() {
     if (i == buffer_size) {
       Sort_Buffer(buffers, i, runningNumber);
       i = 0;
-      memset(buffers, 0, sizeof(buffers));
+      //memset(buffers, 0, sizeof(buffers));
       // clear buffers to empty
     }
   }
