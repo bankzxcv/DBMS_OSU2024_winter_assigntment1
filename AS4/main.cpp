@@ -125,8 +125,6 @@ int main()
                 {
                     cout << buffers[i].emp_record.eid << endl;
 
-                    ostringstream str1;
-
                     long salary = buffers[i].emp_record.salary;
                     // Write some data to the file
                     outfile << buffers[i].emp_record.eid << "," << buffers[i].emp_record.ename << "," << buffers[i].emp_record.age << "," << salary << endl;
@@ -160,8 +158,51 @@ int main()
     fstream SortOut;
     SortOut.open("EmpSorted.csv", ios::out | ios::app);
 
-    // 1. Create runs for Emp which are sorted using Sort_Buffer()
+    fstream empinPass1;
+    empinPass1.open("output.txt", ios::in);
+    if (!empinPass1.is_open())
+    {
+        cerr << "Error: Could not open the file." << endl;
+        return 1; // Return error code
+    }
+    ofstream outputPass2("outputPass2.txt");
 
+    // Check if the file is opened successfully
+    if (!outputPass2.is_open())
+    {
+        cerr << "Error: Could not open the file." << endl;
+        // Return error code
+    }
+    // 1. Create runs for Emp which are sorted using Sort_Buffer()
+    count = 0;
+    int nubLine = 0;
+    while (empinPass1)
+    {
+        Records r = Grab_Emp_Record(empinPass1);
+        if (r.no_values != -1)
+        {
+            buffers[count] = r;
+
+            // Output the line if it's the 21st line or a multiple of 21
+            if (nubLine == 21 || nubLine % 21 == 0)
+            {
+                long salary = buffers[count].emp_record.salary;
+                outputPass2 << buffers[count].emp_record.eid << "," << buffers[count].emp_record.ename << "," << buffers[count].emp_record.age << "," << salary << endl;
+
+                r.print();
+                cout << "------------------" << endl;
+            }
+
+            count++;
+            if (count > 20)
+            {
+                count = 0;
+            }
+        }
+        nubLine++;
+    }
+    cout << nubLine << endl;
+    outputPass2.close();
     // 2. Use Merge_Runs() to Sort the runs of Emp relations
 
     // Please delete the temporary files (runs) after you've sorted the Emp.csv

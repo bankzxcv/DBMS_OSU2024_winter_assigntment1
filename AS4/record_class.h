@@ -28,7 +28,7 @@ public:
         cout << "eid: " << emp_record.eid << endl;
         cout << "ename: " << emp_record.ename << endl;
         cout << "age: " << emp_record.age << endl;
-        cout << "salary: " << emp_record.salary << endl;
+        cout << "salary: " << (double) emp_record.salary << endl;
     }
 };
 
