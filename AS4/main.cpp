@@ -186,8 +186,8 @@ int main()
             // Output the line if it's the 21st line or a multiple of 21
             if (nubLine == 21 || nubLine % 21 == 0)
             {
-                long salary = buffers[count].emp_record.salary;
-                outputPass2 << buffers[count].emp_record.eid << "," << buffers[count].emp_record.ename << "," << buffers[count].emp_record.age << "," << salary << endl;
+
+                outputPass2 << buffers[count].emp_record.eid << "," << buffers[count].emp_record.ename << "," << buffers[count].emp_record.age << "," << (int)buffers[count].emp_record.salary << endl;
 
                 r.print();
                 cout << "------------------" << endl;
