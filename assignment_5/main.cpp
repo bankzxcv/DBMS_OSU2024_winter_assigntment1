@@ -265,6 +265,7 @@ void Merge_Join_Runs()
             return;
         }
 
+        // farray_DEPT[fi] = run;
         farray_DEPT[fi].swap(run);
         fi++;
     }
@@ -282,7 +283,7 @@ void Merge_Join_Runs()
             cerr << "Failed to open file runs.csv" << endl;
             return;
         }
-
+        // farray_EMP[fi] = run;
         farray_EMP[fi].swap(run);
         fi++;
     }
@@ -335,46 +336,133 @@ void Merge_Join_Runs()
     }
     int dfsfsjhf = 1;
     int nub_run_dept = 1; // 1-nub_D
-    while (true)
+
+    // while (true)
+    // {
+
+    //     Records rE_empS = Grab_Emp_Record(testttttE);
+    //     if (rE_empS.emp_record.eid == NULL)
+    //     {
+
+    //         cout << "NULL" << endl;
+    //     }
+    //     if (rE_empS.no_values == -1)
+    //     {
+    //         break;
+    //     }
+    //     else
+    //     {
+
+    //         for (int i = 0; i < nub_E; i++)
+    //         {
+    //             // if (buffers_Test[i].dept_record.managerid > buffers_Test[nub_E].emp_record.eid)
+    //             // {
+    //             //     //get new record
+    //             //     continue;
+    //             // }
+
+    //             buffers_Test[nub_E] = rE_empS;
+    //             cout << "----------------------------------------------------------------" << dfsfsjhf << "\n";
+    //             cout << "buffers_Test[nub_E].emp_record.eid - " << buffers_Test[nub_E].emp_record.eid << "\n";
+    //             cout << "buffers_Test[1].dept_record.managerid - " << buffers_Test[i].dept_record.managerid << "\n";
+    //             if (buffers_Test[nub_E].emp_record.eid == buffers_Test[i].dept_record.managerid)
+    //             {
+    //                 cout << "_AASD_AD_A_SDAS_DA_SD_ASD_A_SD_ASD_AS_D_ASD_ASD_SA__SA \n";
+    //                 buffers_Test[0] = joinR(buffers_Test[i], buffers_Test[nub_E]); // this line
+
+    //                 out << buffers_Test[0].emp_record.eid << ","
+    //                     << buffers_Test[0].emp_record.ename << ","
+    //                     << buffers_Test[0].emp_record.age << ","
+    //                     << buffers_Test[0].emp_record.salary << ","
+    //                     << buffers_Test[0].dept_record.did << ","
+    //                     << buffers_Test[0].dept_record.dname << ","
+    //                     << buffers_Test[0].dept_record.budget << ","
+    //                     << buffers_Test[0].dept_record.managerid << endl;
+    //             }
+    //             else
+    //             {
+
+    //             }
+    //         }
+    //     }
+    //     dfsfsjhf++;
+    // }
+    int mark = NULL;
+    int nub_D_S = 1;
+
+    Records testttt = Grab_Emp_Record(testttttE);
+
+    if (testttt.emp_record.eid == NULL)
     {
-
-        Records rE_empS = Grab_Emp_Record(testttttE);
-        if (rE_empS.emp_record.eid == NULL)
+    }
+    if (testttt.no_values == -1)
+    {
+        return;
+    }
+    buffers_Test[nub_E] = testttt;
+    do
+    {
+        cout << "asd" << endl;
+        if (mark == NULL)
         {
+            cout << "mark = NULL" << endl;
+            while (buffers_Test[nub_E].emp_record.eid < buffers_Test[1].dept_record.managerid)
+            {
 
-            cout << "NULL" << endl;
+                Records sdasdasdasd = Grab_Emp_Record(testttttE);
+                if (sdasdasdasd.emp_record.eid == NULL)
+                {
+                }
+                if (sdasdasdasd.no_values == -1)
+                {
+                    return;
+                }
+                buffers_Test[nub_E] = sdasdasdasd;
+            }
+            while (buffers_Test[nub_E].emp_record.eid > buffers_Test[nub_D_S].dept_record.managerid)
+            {
+                nub_D_S++;
+                if (nub_D_S == nub_E)
+                {
+                    //
+                    cout << "nub_D_S == nub_E" << endl;
+                    return;
+                }
+            }
+            mark = nub_D_S;
         }
-        if (rE_empS.no_values == -1)
+        if (buffers_Test[nub_E].emp_record.eid == buffers_Test[nub_D_S].dept_record.managerid)
         {
-            break;
+            cout << "match" << endl;
+            buffers_Test[0] = joinR(buffers_Test[nub_D_S], buffers_Test[nub_E]); // this line
+
+            out << buffers_Test[0].emp_record.eid << ","
+                << buffers_Test[0].emp_record.ename << ","
+                << buffers_Test[0].emp_record.age << ","
+                << buffers_Test[0].emp_record.salary << ","
+                << buffers_Test[0].dept_record.did << ","
+                << buffers_Test[0].dept_record.dname << ","
+                << buffers_Test[0].dept_record.budget << ","
+                << buffers_Test[0].dept_record.managerid << endl;
+
+            nub_D_S++;
         }
         else
         {
-            for (int i = 0; i < nub_E; i++)
+            nub_D_S = mark;
+            mark = NULL;
+            Records sdasdasdasd = Grab_Emp_Record(testttttE);
+            if (sdasdasdasd.emp_record.eid == NULL)
             {
-
-                buffers_Test[nub_E] = rE_empS;
-                cout << "----------------------------------------------------------------" << dfsfsjhf << "\n";
-                cout << "buffers_Test[nub_E].emp_record.eid - " << buffers_Test[nub_E].emp_record.eid << "\n";
-                cout << "buffers_Test[1].dept_record.managerid - " << buffers_Test[i].dept_record.managerid << "\n";
-                if (buffers_Test[nub_E].emp_record.eid == buffers_Test[i].dept_record.managerid)
-                {
-                    cout << "_AASD_AD_A_SDAS_DA_SD_ASD_A_SD_ASD_AS_D_ASD_ASD_SA__SA \n";
-                    buffers_Test[0] = joinR(buffers_Test[i], buffers_Test[nub_E]); // this line
-
-                    out << buffers_Test[0].emp_record.eid << ","
-                        << buffers_Test[0].emp_record.ename << ","
-                        << buffers_Test[0].emp_record.age << ","
-                        << buffers_Test[0].emp_record.salary << ","
-                        << buffers_Test[0].dept_record.did << ","
-                        << buffers_Test[0].dept_record.dname << ","
-                        << buffers_Test[0].dept_record.budget << ","
-                        << buffers_Test[0].dept_record.managerid << endl;
-                }
             }
+            if (sdasdasdasd.no_values == -1)
+            {
+                return;
+            }
+            buffers_Test[nub_E] = sdasdasdasd;
         }
-        dfsfsjhf++;
-    }
+
+    } while (true);
 
     out.close();
 }
