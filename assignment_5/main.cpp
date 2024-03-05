@@ -186,7 +186,7 @@ void Merge_Runs()
             for (int i = 0; i < 22; i++)
             {
                 string filename = "Erun_" + to_string(i) + ".csv";
-                remove(filename.c_str());
+                // remove(filename.c_str());
             }
             return;
         }
@@ -207,10 +207,20 @@ void Merge_Runs()
         int outPage = buffers[0].currentMPage + 1;
         cout << "-----" << endl;
         cout << "Previous Index = " << buffers[outPage].index << endl;
+        cout<< "HERE0" <<endl;
         fstream pickingRun;
+        cout<< "HERE1" <<endl;
         pickingRun.open(buffers[outPage].runName, ios::in);
+        cout<< "HERE2" <<endl;
         pickingRun.seekg(buffers[outPage].index);
+
+        cout<< "HERE3" <<endl;
         Records r = Grab_Emp_Record(pickingRun);
+        if (r.no_values == -1)
+        {
+            cout << "ASDASDASD" << endl;
+            break;
+        }
         buffers[outPage] = r;
         buffers[outPage].index = pickingRun.tellg();
         buffers[outPage].runName = "Erun_" + to_string(outPage - 1) + ".csv";
@@ -287,7 +297,7 @@ void Merge_Join_Runs()
         farray_EMP[fi].swap(run);
         fi++;
     }
-    // Merge_Runs();
+    Merge_Runs();
 
     fstream out;
     out.open("Join.csv", ios::out | ios::app);
@@ -582,9 +592,9 @@ int main()
     for (int i = 0; i < buffer_size; i++)
     {
         string filename = "Erun_" + to_string(i) + ".csv";
-        remove(filename.c_str());
+        // remove(filename.c_str());
         filename = "Drun_" + to_string(i) + ".csv";
-        remove(filename.c_str());
+        // remove(filename.c_str());
     }
 
     cout << "ENDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD \n";

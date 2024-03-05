@@ -64,8 +64,14 @@ Records Grab_Emp_Record(fstream &empin)
     {
         // turn line into a stream
         stringstream s(line);
+        cout <<line << " --- -------<<<<" << endl;
         // gets everything in stream up to comma
+        // if (s == "")
+        // {
+        //     return;
+        // }
         getline(s, word, ',');
+
         emp.emp_record.eid = stoi(word);
         getline(s, word, ',');
         emp.emp_record.ename = word;
