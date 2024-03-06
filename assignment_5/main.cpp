@@ -11,14 +11,219 @@ using namespace std;
 
 Records buffers[buffer_size];  // use this class object of size 22 as your main
                                // memory
-Records buffers_2[buffer_size];
 /***You can change return type and arguments as you want.***/
 int B_EMP = 0;   // number of emp file
 int B_DEPT = 0;  // number of dept file
 vector<string> fn_emp;
 vector<string> fn_dept;
-vector<fstream> v_emp;
-vector<fstream> v_dept;
+
+void Merge_Runs_Emp() {
+  cout << "Merge Run" << endl;
+  int count = 0;
+  int countItem = fn_emp.size() < 22 ? fn_emp.size() : 21;
+  for (int i = 0; i < countItem; i++) {
+    fstream run;
+    // string stringFileName = "run_" + to_string(i - 1) + ".csv";
+    string stringFileName = fn_emp[i];
+    run.open(stringFileName, ios::in);
+    if (!run.is_open()) {
+      cerr << "Failed to open file " + stringFileName << endl;
+      continue;
+    }
+    Records r = Grab_Emp_Record(run);
+    buffers[i + 1] = r;
+    buffers[i + 1].index = run.tellg();
+    buffers[i + 1].runName = stringFileName;
+    run.close();
+    count++;
+  }
+  cout << "having " << count << " runs" << endl;
+
+  buffers[0].no_values = -1;
+  buffers[0].runName = "EmpSorted.csv";
+  buffers[0].emp_record.eid = numeric_limits<int>::max();
+  cout << "RIGHT HERE" << endl;
+
+  // function min of two integers
+  auto min = [](int a, int b) { return a < b ? a : b; };
+
+  // define max Int
+  int maxInt = numeric_limits<int>::max();
+
+  // function min of two records
+  int minIndex = min(22, count);
+
+  while (true) {
+    buffers[0].emp_record.eid = maxInt;
+    buffers[0].no_values = -1;
+    for (int i = 1; i <= minIndex; i++) {
+      cout << "buffer[" << i << "].eid = " << buffers[i].emp_record.eid
+           << " file = " << buffers[i].runName << " index: " << buffers[i].index
+           << endl;
+
+      if (buffers[i].no_values == -1) {
+        continue;
+      }
+      if (buffers[i].emp_record.eid < buffers[0].emp_record.eid) {
+        buffers[0].emp_record = buffers[i].emp_record;
+        buffers[0].currentMPage = i - 1;
+        buffers[0].no_values = 1;
+      }
+    }
+
+    cout << "outputBuffer value = " << buffers[0].emp_record.eid << endl;
+    cout << "currentMPage = " << buffers[0].currentMPage << endl;
+    if (buffers[0].no_values == -1) {
+      cout << "no_values = -1" << endl;
+      // remove all run files
+      for (int i = 0; i < 22; i++) {
+        string filename = "Erun_" + to_string(i) + ".csv";
+        remove(filename.c_str());
+      }
+      fn_emp.clear();
+      fn_emp.push_back("EmpSorted.csv");
+      return;
+    }
+    // open file to write
+    fstream out;
+    out.open(buffers[0].runName, ios::out | ios::app);
+    if (!out.is_open()) {
+      cerr << "Failed to open file " + buffers[0].runName << endl;
+      return;
+    }
+    out << buffers[0].emp_record.eid << "," << buffers[0].emp_record.ename
+        << "," << buffers[0].emp_record.age << ","
+        << buffers[0].emp_record.salary << endl;
+    out.close();
+
+    // read next of buffer[0].currentMPage
+    int outPage = buffers[0].currentMPage + 1;
+    cout << "-----" << endl;
+    cout << "Previous Index = " << buffers[outPage].index << endl;
+    fstream pickingRun;
+    pickingRun.open(buffers[outPage].runName, ios::in);
+    pickingRun.seekg(buffers[outPage].index);
+    Records r = Grab_Emp_Record(pickingRun);
+    buffers[outPage] = r;
+    buffers[outPage].index = pickingRun.tellg();
+    buffers[outPage].runName = "Erun_" + to_string(outPage - 1) + ".csv";
+    pickingRun.close();
+    // cout above
+    cout << "---------------- new data buffer " << endl;
+    cout << "id = " << buffers[outPage].emp_record.eid << endl;
+    cout << "name = " << buffers[outPage].emp_record.ename << endl;
+    cout << "next index = " << buffers[outPage].index << endl;
+    cout << "file name =  " << buffers[outPage].runName << endl;
+    cout << "No value = " << buffers[outPage].no_values << endl;
+    int tmp;
+    cout << "wait for enter: " << endl;
+    // cin >> tmp;
+  }
+}
+
+void Merge_Runs_Dept() {
+  cout << "Merge Run" << endl;
+  int count = 0;
+  int countItem = fn_dept.size() < 22 ? fn_dept.size() : 21;
+  for (int i = 0; i < countItem; i++) {
+    fstream run;
+    // string stringFileName = "run_" + to_string(i - 1) + ".csv";
+    string stringFileName = fn_dept[i];
+
+    run.open(stringFileName, ios::in);
+    if (!run.is_open()) {
+      cerr << "Failed to open file " + stringFileName << endl;
+      continue;
+    }
+    Records r = Grab_Emp_Record(run);
+    buffers[i + 1] = r;
+    buffers[i + 1].index = run.tellg();
+    buffers[i + 1].runName = stringFileName;
+    run.close();
+    count++;
+  }
+  cout << "having " << count << " runs" << endl;
+
+  buffers[0].no_values = -1;
+  buffers[0].runName = "DeptSorted.csv";
+  buffers[0].emp_record.eid = numeric_limits<int>::max();
+  cout << "RIGHT HERE" << endl;
+  // function min of two integers
+  auto min = [](int a, int b) { return a < b ? a : b; };
+
+  // define max Int
+  int maxInt = numeric_limits<int>::max();
+
+  // function min of two records
+  int minIndex = min(22, count);
+
+  while (true) {
+    buffers[0].emp_record.eid = maxInt;
+    buffers[0].no_values = -1;
+    for (int i = 1; i <= minIndex; i++) {
+      cout << "buffer[" << i << "].eid = " << buffers[i].emp_record.eid
+           << " file = " << buffers[i].runName << " index: " << buffers[i].index
+           << endl;
+
+      if (buffers[i].no_values == -1) {
+        continue;
+      }
+      if (buffers[i].emp_record.eid < buffers[0].emp_record.eid) {
+        buffers[0].emp_record = buffers[i].emp_record;
+        buffers[0].currentMPage = i - 1;
+        buffers[0].no_values = 1;
+      }
+    }
+
+    cout << "outputBuffer value = " << buffers[0].emp_record.eid << endl;
+    cout << "currentMPage = " << buffers[0].currentMPage << endl;
+    if (buffers[0].no_values == -1) {
+      cout << "no_values = -1" << endl;
+      // remove all run files
+      for (int i = 0; i < 22; i++) {
+        string filename = "Drun_" + to_string(i) + ".csv";
+        remove(filename.c_str());
+      }
+      fn_dept.clear();
+      fn_dept.push_back("DeptSorted.csv");
+      return;
+    }
+    // open file to write
+    fstream out;
+    out.open(buffers[0].runName, ios::out | ios::app);
+    if (!out.is_open()) {
+      cerr << "Failed to open file " + buffers[0].runName << endl;
+      return;
+    }
+    out << buffers[0].emp_record.eid << "," << buffers[0].emp_record.ename
+        << "," << buffers[0].emp_record.age << ","
+        << buffers[0].emp_record.salary << endl;
+    out.close();
+
+    // read next of buffer[0].currentMPage
+    int outPage = buffers[0].currentMPage + 1;
+    cout << "-----" << endl;
+    cout << "Previous Index = " << buffers[outPage].index << endl;
+    fstream pickingRun;
+    pickingRun.open(buffers[outPage].runName, ios::in);
+    pickingRun.seekg(buffers[outPage].index);
+    Records r = Grab_Emp_Record(pickingRun);
+    buffers[outPage] = r;
+    buffers[outPage].index = pickingRun.tellg();
+    buffers[outPage].runName = "Drun_" + to_string(outPage - 1) + ".csv";
+    pickingRun.close();
+    // cout above
+    cout << "---------------- new data buffer " << endl;
+    cout << "id = " << buffers[outPage].emp_record.eid << endl;
+    cout << "name = " << buffers[outPage].emp_record.ename << endl;
+    cout << "next index = " << buffers[outPage].index << endl;
+    cout << "file name =  " << buffers[outPage].runName << endl;
+    cout << "No value = " << buffers[outPage].no_values << endl;
+    int tmp;
+    cout << "wait for enter: " << endl;
+    // cin >> tmp;
+  }
+}
 // Sorting the buffers in main_memory and storing the sorted records into a
 // temporary file (runs)
 void Sort_Buffer_Emp(Records buffers[], int i, int &runningNumber) {
@@ -223,6 +428,10 @@ void Merge_Runs() {
 }
 
 void Merge_Join_Runs() {
+  // loop though fn_emp
+  for (auto i : fn_emp) {
+    cout << "fn_emp: " << i << endl;
+  }
   if (B_DEPT + B_EMP == 0 || B_DEPT == 0 || B_EMP == 0) {
     return;
   }
@@ -232,48 +441,10 @@ void Merge_Join_Runs() {
   // buffer[1] to buffer[21] are M-1 buffers
   cout << "Merge_Join_Runs" << endl;
   cout << "--------------" << endl;
-
-  // for (auto element : fn_dept)
-  // {
-  //     cout << element << endl;
-  //     // openf_D(element);
-  // }
-  fstream farray_DEPT[B_DEPT];
-  fstream farray_EMP[B_EMP];
-  int fi = 0;
-
-  buffers_Test[0].no_values = -1;  // output
-
-  for (auto element : fn_dept) {
-    cout << element << endl;
-    fstream run;
-    run.open(element, ios::in);
-
-    if (!run.is_open()) {
-      cerr << "Failed to open file runs.csv" << endl;
-      return;
-    }
-
-    // farray_DEPT[fi] = run;
-    farray_DEPT[fi].swap(run);
-    fi++;
-  }
-  fi = 0;
-
-  for (auto element : fn_emp) {
-    cout << element << endl;
-    fstream run;
-    run.open(element, ios::in);
-
-    if (!run.is_open()) {
-      cerr << "Failed to open file runs.csv" << endl;
-      return;
-    }
-    // farray_EMP[fi] = run;
-    farray_EMP[fi].swap(run);
-    fi++;
-  }
-  Merge_Runs();
+  // fn_dept, fn_emp
+  int empFiles = fn_emp.size();
+  int deptFiles = fn_dept.size();
+  cout << "empFiles = " << empFiles << " deptFiles = " << deptFiles << endl;
 
   fstream out;
   out.open("Join.csv", ios::out | ios::app);
@@ -281,162 +452,179 @@ void Merge_Join_Runs() {
     cerr << "Failed to open file Join.csv" << endl;
     return;
   }
+  for (int i = 0; i < empFiles; i++) {
+    cout << "fn_emp " << fn_emp[i] << endl;
+    fstream run;
+    // string stringFileName = "Erun_" + to_string(i) + ".csv";
+    string stringFileName = fn_emp[i];
+    cout << stringFileName << endl;
+    run.open(stringFileName, ios::in);
+    if (!run.is_open()) {
+      cout << "HERE1" << endl;
+      cerr << "Failed to open file " + stringFileName << endl;
+      continue;
+    }
+    Records r = Grab_Emp_Record(run);
+    buffers[i + 1] = r;
+    buffers[i + 1].index = run.tellg();
+    buffers[i + 1].runName = stringFileName;
+    run.close();
+  }
 
-  int nub_D = 1;
-  for (int i = 0; i < B_DEPT; i++) {
-    while (true) {
-      if (nub_D == 22) {
+  for (int i = 0; i < deptFiles; i++) {
+    cout << "fn_dept " << fn_dept[i] << endl;
+    fstream run;
+    // string stringFileName = "Drun_" + to_string(i) + ".csv";
+    string stringFileName = fn_dept[i];
+    cout << stringFileName << endl;
+    run.open(stringFileName, ios::in);
+    if (!run.is_open()) {
+      cout << "HERE2" << endl;
+      cerr << "Failed to open file " + stringFileName << endl;
+      continue;
+    }
+    Records r = Grab_Dept_Record(run);
+    buffers[i + empFiles + 1] = r;
+    buffers[i + empFiles + 1].index = run.tellg();
+    buffers[i + empFiles + 1].runName = stringFileName;
+    run.close();
+  }
+
+  buffers[0].runName = "Join.csv";
+
+  // function min of two integers
+  auto min = [](int a, int b) { return a < b ? a : b; };
+  int maxInt = numeric_limits<int>::max();
+
+  int isMark = 0;
+
+  while (true) {
+    for (int i = 0; i < empFiles; i++) {
+      int pos = i + 1;
+      cout << "buffer[" << pos << "].eid = " << buffers[pos].emp_record.eid
+           << " file = " << buffers[pos].runName
+           << " index: " << buffers[pos].index << endl;
+    }
+    for (int i = 0; i < deptFiles; i++) {
+      int pos = i + empFiles + 1;
+      cout << "buffer[" << pos
+           << "].managerid = " << buffers[pos].dept_record.managerid
+           << " file = " << buffers[pos].runName
+           << " index: " << buffers[pos].index << endl;
+    }
+
+    int minEmpPosBuffer = 1;
+    for (int i = 1; i < empFiles; i++) {
+      int pos = i + 1;
+      int a = buffers[pos].emp_record.eid;
+      int b = buffers[pos - 1].emp_record.eid;
+      if (buffers[pos].index == -1 && buffers[pos - 1].index == -1) {
+        continue;
       }
-      Records rD = Grab_Dept_Record(farray_DEPT[i]);
-      //   cout << "nub_D " << nub_D << endl;
-      //   rD.print();
-
-      if (rD.no_values == -1) {
-        break;
-      } else {
-        buffers_Test[nub_D] = rD;
-
-        nub_D++;
+      if (buffers[pos].index == -1 && buffers[pos - 1].index != -1) {
+        minEmpPosBuffer = pos - 1;
+        continue;
       }
+      if (buffers[pos].index != -1 && buffers[pos - 1].index == -1) {
+        minEmpPosBuffer = pos;
+        continue;
+      }
+      if (a < b) {
+        minEmpPosBuffer = pos;
+      }
+    }
+
+    int minDeptPosBuffer = empFiles + 1;
+    for (int i = 1; i < deptFiles; i++) {
+      int pos = i + empFiles + 1;
+      int a = buffers[pos].dept_record.managerid;
+      int b = buffers[pos - 1].dept_record.managerid;
+      if (a < b) {
+        minDeptPosBuffer = pos;
+      }
+    }
+
+    if (buffers[minEmpPosBuffer].no_values == -1 ||
+        buffers[minDeptPosBuffer].no_values == -1) {
+      break;
+    }
+
+    if (buffers[minEmpPosBuffer].emp_record.eid <
+        buffers[minDeptPosBuffer].dept_record.managerid) {
+      // shift emp
+      cout << "eid < managerid" << buffers[minEmpPosBuffer].emp_record.eid
+           << buffers[minDeptPosBuffer].dept_record.managerid << endl;
+      int pos = minEmpPosBuffer;
+      int filePos = pos - 1;
+      fstream run;
+      // string stringFileName = "Erun_" + to_string(filePos) + ".csv";
+      string stringFileName = buffers[pos].runName;
+      run.open(stringFileName, ios::in);
+      run.seekg(buffers[pos].index);
+      Records r = Grab_Emp_Record(run);
+      buffers[pos] = r;
+      buffers[pos].index = run.tellg();
+      buffers[pos].runName = stringFileName;
+      run.close();
+      continue;
+    }
+
+    if (buffers[minDeptPosBuffer].index == -1) {
+      break;
+    }
+
+    if (buffers[minEmpPosBuffer].emp_record.eid >
+        buffers[minDeptPosBuffer].dept_record.managerid) {
+      // shift dept
+      cout << "eid > managerid" << buffers[minEmpPosBuffer].emp_record.eid
+           << buffers[minDeptPosBuffer].dept_record.managerid << endl;
+      int pos = minDeptPosBuffer;
+      int filePos = pos - empFiles - 1;
+      fstream run;
+      string stringFileName = "Drun_" + to_string(filePos) + ".csv";
+      run.open(stringFileName, ios::in);
+      run.seekg(buffers[pos].index);
+      Records r = Grab_Dept_Record(run);
+      buffers[pos] = r;
+      buffers[pos].index = run.tellg();
+      buffers[pos].runName = stringFileName;
+      run.close();
+      continue;
+    }
+
+    if (buffers[minEmpPosBuffer].emp_record.eid ==
+        buffers[minDeptPosBuffer].dept_record.managerid) {
+      isMark = 1;
+      cout << "Joining " << endl;
+      Records r = joinR(buffers[minDeptPosBuffer], buffers[minEmpPosBuffer]);
+      buffers[0].emp_record = r.emp_record;
+      buffers[0].dept_record = r.dept_record;
+      string temp = to_string(buffers[0].emp_record.eid) + "," +
+                    buffers[0].emp_record.ename + "," +
+                    to_string(buffers[0].emp_record.age) + "," +
+                    to_string(buffers[0].emp_record.salary) + "," +
+                    to_string(buffers[0].dept_record.did) + "," +
+                    buffers[0].dept_record.dname + "," +
+                    to_string(buffers[0].dept_record.budget) + "," +
+                    to_string(buffers[0].dept_record.managerid);
+      fstream out;
+      out.open(buffers[0].runName, ios::out | ios::app);
+      out << temp << endl;
+      // ship dept
+
+      fstream run;
+      string stringFileName = buffers[minDeptPosBuffer].runName;
+      run.open(stringFileName, ios::in);
+      run.seekg(buffers[minDeptPosBuffer].index);
+      Records reading = Grab_Dept_Record(run);
+      buffers[minDeptPosBuffer].dept_record = reading.dept_record;
+      buffers[minDeptPosBuffer].index = run.tellg();
+      run.close();
     }
   }
 
-  int nub_E = nub_D + 1;
-
-  fstream testttttE;
-  string fnammmm = "EmpSorted.csv";
-  testttttE.open(fnammmm, ios::in);
-  if (!testttttE.is_open()) {
-    cerr << "Failed to open file runs.csv" << endl;
-    return;
-  }
-  int dfsfsjhf = 1;
-  int nub_run_dept = 1;  // 1-nub_D
-
-  // while (true)
-  // {
-
-  //     Records rE_empS = Grab_Emp_Record(testttttE);
-  //     if (rE_empS.emp_record.eid == NULL)
-  //     {
-
-  //         cout << "NULL" << endl;
-  //     }
-  //     if (rE_empS.no_values == -1)
-  //     {
-  //         break;
-  //     }
-  //     else
-  //     {
-
-  //         for (int i = 0; i < nub_E; i++)
-  //         {
-  //             // if (buffers_Test[i].dept_record.managerid >
-  //             buffers_Test[nub_E].emp_record.eid)
-  //             // {
-  //             //     //get new record
-  //             //     continue;
-  //             // }
-
-  //             buffers_Test[nub_E] = rE_empS;
-  //             cout <<
-  //             "----------------------------------------------------------------"
-  //             << dfsfsjhf << "\n"; cout <<
-  //             "buffers_Test[nub_E].emp_record.eid - " <<
-  //             buffers_Test[nub_E].emp_record.eid << "\n"; cout <<
-  //             "buffers_Test[1].dept_record.managerid - " <<
-  //             buffers_Test[i].dept_record.managerid << "\n"; if
-  //             (buffers_Test[nub_E].emp_record.eid ==
-  //             buffers_Test[i].dept_record.managerid)
-  //             {
-  //                 cout <<
-  //                 "_AASD_AD_A_SDAS_DA_SD_ASD_A_SD_ASD_AS_D_ASD_ASD_SA__SA
-  //                 \n"; buffers_Test[0] = joinR(buffers_Test[i],
-  //                 buffers_Test[nub_E]); // this line
-
-  //                 out << buffers_Test[0].emp_record.eid << ","
-  //                     << buffers_Test[0].emp_record.ename << ","
-  //                     << buffers_Test[0].emp_record.age << ","
-  //                     << buffers_Test[0].emp_record.salary << ","
-  //                     << buffers_Test[0].dept_record.did << ","
-  //                     << buffers_Test[0].dept_record.dname << ","
-  //                     << buffers_Test[0].dept_record.budget << ","
-  //                     << buffers_Test[0].dept_record.managerid << endl;
-  //             }
-  //             else
-  //             {
-
-  //             }
-  //         }
-  //     }
-  //     dfsfsjhf++;
-  // }
-  int mark = NULL;
-  int nub_D_S = 1;
-
-  Records testttt = Grab_Emp_Record(testttttE);
-
-  if (testttt.emp_record.eid == NULL) {
-  }
-  if (testttt.no_values == -1) {
-    return;
-  }
-  buffers_Test[nub_E] = testttt;
-  do {
-    // cout << "asd" << endl;
-    if (mark == NULL) {
-      // cout << "mark = NULL" << endl;
-      while (buffers_Test[nub_E].emp_record.eid <
-             buffers_Test[1].dept_record.managerid) {
-        Records sdasdasdasd = Grab_Emp_Record(testttttE);
-        if (sdasdasdasd.emp_record.eid == NULL) {
-        }
-        if (sdasdasdasd.no_values == -1) {
-          return;
-        }
-        buffers_Test[nub_E] = sdasdasdasd;
-      }
-      while (buffers_Test[nub_E].emp_record.eid >
-             buffers_Test[nub_D_S].dept_record.managerid) {
-        nub_D_S++;
-        if (nub_D_S == nub_E) {
-          //
-          // cout << "nub_D_S == nub_E" << endl;
-          return;
-        }
-      }
-      mark = nub_D_S;
-    }
-    if (buffers_Test[nub_E].emp_record.eid ==
-        buffers_Test[nub_D_S].dept_record.managerid) {
-      // cout << "match" << endl;
-      buffers_Test[0] =
-          joinR(buffers_Test[nub_D_S], buffers_Test[nub_E]);  // this line
-
-      out << buffers_Test[0].emp_record.eid << ","
-          << buffers_Test[0].emp_record.ename << ","
-          << buffers_Test[0].emp_record.age << ","
-          << buffers_Test[0].emp_record.salary << ","
-          << buffers_Test[0].dept_record.did << ","
-          << buffers_Test[0].dept_record.dname << ","
-          << buffers_Test[0].dept_record.budget << ","
-          << buffers_Test[0].dept_record.managerid << endl;
-
-      nub_D_S++;
-    } else {
-      nub_D_S = mark;
-      mark = NULL;
-      Records sdasdasdasd = Grab_Emp_Record(testttttE);
-      if (sdasdasdasd.emp_record.eid == NULL) {
-      }
-      if (sdasdasdasd.no_values == -1) {
-        return;
-      }
-      buffers_Test[nub_E] = sdasdasdasd;
-    }
-
-  } while (true);
-
+  // define buffers[0] as an output buffer
+  // define buffers[1] to buffers[21] as M-1 buffers
   out.close();
 }
 
@@ -499,57 +687,24 @@ int main() {
     }
   }
 
-  // clear
-  cout << "---------------clear--------------------------- \n";
+  // 2. Use Merge_Join_Runs() to Join the runs of Dept and Emp relations
+
+  // if size of dept + emp > 22
+  if (fn_dept.size() + fn_emp.size() > 22) {
+    Merge_Runs_Dept();
+  }
+  if (fn_dept.size() + fn_emp.size() > 22) {
+    Merge_Runs_Emp();
+  }
 
   Merge_Join_Runs();
 
-  // 2. Use Merge_Join_Runs() to Join the runs of Dept and Emp relations
-  // Merge_Join_Runs();
-
-  // for (int i = 0; i < buffer_size; i++)
-  // {
-  //     fstream deptin;
-  //     string stringFileName = "Drun_" + to_string(i) + ".csv";
-  //     deptin.open(stringFileName, ios::in);
-  //     if (!deptin.is_open())
-  //     {
-  //         cerr << "Failed to open file " + stringFileName << endl;
-  //     }
-  //     Records rD = Grab_Dept_Record(deptin);
-  //     buffers[i] = rD;
-  //     rD.print();
-
-  //     for (int j = 0; j < buffer_size; j++)
-  //     {
-
-  //         fstream empin;
-  //         string stringFileName = "Erun_" + to_string(j) + ".csv";
-  //         empin.open(stringFileName, ios::in);
-  //         if (!empin.is_open())
-  //         {
-  //             cerr << "Failed to open file " + stringFileName << endl;
-  //             continue;
-  //         }
-  //         Records rE = Grab_Emp_Record(empin);
-  //         rE.print();
-  //         if (rE.emp_record.eid = rD.dept_record.managerid)
-  //         {
-  //             cout << "Match" << endl;
-  //         }
-  //         empin.close();
-  //     }
-  //     deptin.close();
-  // }
-  // Please delete the temporary files (runs) after you've joined both Emp.csv
-  // and Dept.csv
-  for (int i = 0; i < buffer_size; i++) {
-    string filename = "Erun_" + to_string(i) + ".csv";
-    // remove(filename.c_str());
-    filename = "Drun_" + to_string(i) + ".csv";
-    // remove(filename.c_str());
+  // remove
+  for (int i = 0; i < fn_emp.size(); i++) {
+    remove(fn_emp[i].c_str());
   }
-
-  cout << "ENDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD \n";
+  for (int i = 0; i < fn_dept.size(); i++) {
+    remove(fn_dept[i].c_str());
+  }
   return 0;
 }
